@@ -1,0 +1,272 @@
+﻿<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rivela — Catálogo premium</title>
+  <meta name="description" content="Catálogo mobile-first para una pastelería premium con carrito, detalle de producto y checkout vía WhatsApp." />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="top-promo">Promo de temporada · <strong>15% OFF</strong> en cajas regalo y tartas seleccionadas · Pedidos por WhatsApp</div>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="#inicio" class="brand" aria-label="Rivela Home">
+        <span class="brand-mark">Rive<span class="script-l">l</span>a</span>
+        <span class="brand-subtitle">Pastelería premium</span>
+      </a>
+      <nav class="desktop-nav" aria-label="Navegación principal">
+        <a href="#catalogo">Catálogo</a>
+        <a href="#proceso">Proceso</a>
+        <button type="button" data-open-checkout>Pedido</button>
+      </nav>
+      <button class="header-cart" type="button" data-open-cart aria-label="Abrir carrito">
+        <span>🛒</span>
+        <span class="cart-text">Carrito</span>
+        <span class="cart-count" data-cart-count>0</span>
+      </button>
+    </div>
+  </header>
+
+  <main id="inicio">
+    <section class="hero" aria-labelledby="hero-title">
+      <article class="hero-card">
+        <div class="hero-content">
+          <span class="eyebrow">Horneado artesanal · Detalle premium</span>
+          <h1 id="hero-title">Dulces con memoria, diseño y <span>calma</span>.</h1>
+          <p>Un catálogo pensado para elegir postres de autor, revisar cada detalle, armar tu pedido y enviarlo por WhatsApp sin procesos innecesarios.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#catalogo">Ver catálogo</a>
+            <button class="btn btn-secondary" type="button" data-open-cart>Revisar carrito</button>
+          </div>
+        </div>
+        <div class="hero-badge"><span><b>15%</b>off cajas</span></div>
+        <svg class="hero-visual" viewBox="0 0 520 470" aria-hidden="true">
+          <path d="M84 334c50 42 255 63 341-11 47-40 33-111-7-135-55-34-78 19-146-41-65-57-160-36-192 30-24 49-44 116 4 157z" fill="#f1a7ef" opacity=".9"/>
+          <path d="M121 320c62 41 206 43 275-4" fill="none" stroke="#fffaf0" stroke-width="8" stroke-linecap="round" opacity=".78"/>
+          <path d="M148 260c55 20 184 34 255-9l-26 73c-53 31-170 39-242 2l13-66z" fill="#fffaf0"/>
+          <path d="M154 258c53 24 181 36 246-9" fill="none" stroke="#431819" stroke-width="4" stroke-linecap="round" opacity=".55"/>
+          <path d="M202 210c27-45 84-63 132-34 36 22 48 52 38 75-54 31-161 33-224 7 7-16 24-31 54-48z" fill="#5b2426"/>
+          <path d="M214 217c14 15 24 21 40 9 19-15 34-9 46 4 20 22 42 11 55-2" fill="none" stroke="#f1a7ef" stroke-width="8" stroke-linecap="round"/>
+          <circle cx="238" cy="196" r="7" fill="#fffaf0" opacity=".9"/>
+          <circle cx="318" cy="200" r="9" fill="#fffaf0" opacity=".78"/>
+          <path d="M92 132c22-21 63-16 79 11 18 31-10 65-45 58-29-6-50-45-34-69z" fill="#fffaf0" opacity=".9"/>
+          <path d="M103 149c20-7 40 5 45 26" fill="none" stroke="#431819" stroke-width="4" stroke-linecap="round" opacity=".45"/>
+          <path d="M390 118c29 3 50 31 42 57-8 28-42 36-65 17-22-18-15-68 23-74z" fill="#f8f1e7" opacity=".9"/>
+          <path d="M376 162c18-13 38-11 51 5" fill="none" stroke="#431819" stroke-width="4" stroke-linecap="round" opacity=".45"/>
+          <path d="M60 374c100 68 337 66 416-9" fill="none" stroke="#fffaf0" stroke-width="3" stroke-linecap="round" opacity=".45"/>
+        </svg>
+      </article>
+
+      <aside class="quick-panel" aria-label="Beneficios de compra">
+        <div class="mini-row">
+          <div class="mini-icon">✦</div>
+          <div><h3>Catálogo directo</h3><p>Productos, precios y detalle sin fricción.</p></div>
+        </div>
+        <div class="mini-row">
+          <div class="mini-icon">↗</div>
+          <div><h3>Pedido por WhatsApp</h3><p>El checkout arma el mensaje con todos los datos.</p></div>
+        </div>
+        <div class="mini-row">
+          <div class="mini-icon">♡</div>
+          <div><h3>Estética Rivela</h3><p>Lavanda, vino, crema, empaques y trazos suaves.</p></div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="section" id="catalogo" aria-labelledby="catalog-title">
+      <div class="section-heading">
+        <div>
+          <span class="section-kicker">Catálogo</span>
+          <h2 id="catalog-title">Elige tu próximo antojo.</h2>
+        </div>
+        <p>Diseño mobile-first: en celular funciona como catálogo rápido; en desktop mantiene una grilla amplia y visual para explorar mejor cada producto.</p>
+      </div>
+
+      <div class="filters" aria-label="Filtros de catálogo">
+        <button class="filter-pill is-active" type="button" data-filter="all">Todo</button>
+        <button class="filter-pill" type="button" data-filter="tartas">Tartas</button>
+        <button class="filter-pill" type="button" data-filter="individuales">Individuales</button>
+        <button class="filter-pill" type="button" data-filter="cajas">Cajas regalo</button>
+      </div>
+
+      <div class="product-grid" id="productGrid"></div>
+    </section>
+
+    <section class="section" id="proceso">
+      <div class="story-band">
+        <div>
+          <span class="section-kicker" style="color:var(--lavender-2)">Cómo funciona</span>
+          <h2>Un pedido simple, con sensación de marca cuidada.</h2>
+          <p>La experiencia evita parecer una tienda genérica: cada paso conserva el carácter artesanal y cálido de Rivela, pero con una estructura suficientemente clara para vender.</p>
+        </div>
+        <div class="story-features">
+          <div class="story-feature"><b>1</b><span><b>Explorar.</b><br>El usuario ve nombre, precio y una imagen de producto coherente con la identidad.</span></div>
+          <div class="story-feature"><b>2</b><span><b>Elegir.</b><br>Al abrir el detalle puede cambiar cantidad, agregar al carrito o comprar de inmediato.</span></div>
+          <div class="story-feature"><b>3</b><span><b>Enviar.</b><br>El checkout genera un mensaje de WhatsApp con productos, domicilio y datos personales.</span></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <button class="bottom-cart" type="button" data-open-cart aria-label="Ver carrito">
+    <span class="bottom-cart-label"><strong>Ver carrito</strong><small data-mobile-cart-text>Tu pedido está vacío</small></span>
+    <span class="cart-count" data-cart-count>0</span>
+  </button>
+
+  <div class="overlay" id="overlay"></div>
+
+  <section class="modal" id="productModal" aria-modal="true" aria-hidden="true" role="dialog" aria-labelledby="modalTitle">
+    <div class="modal-inner">
+      <div class="modal-media" id="modalMedia"></div>
+      <div class="modal-body">
+        <div class="modal-topline">
+          <span class="tag" id="modalTag">Producto</span>
+          <button class="close-btn" type="button" data-close-all aria-label="Cerrar">×</button>
+        </div>
+        <div>
+          <h2 id="modalTitle">Producto</h2>
+          <div class="price" id="modalPrice">€0,00</div>
+        </div>
+        <p id="modalDescription"></p>
+        <ul class="detail-list" id="modalDetails"></ul>
+        <div class="qty-box">
+          <span>Cantidad</span>
+          <div class="qty-control">
+            <button type="button" data-detail-minus aria-label="Restar cantidad">−</button>
+            <span class="qty-value" id="detailQty">1</span>
+            <button type="button" data-detail-plus aria-label="Sumar cantidad">+</button>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-outline" type="button" id="addToCartBtn">Agregar al carrito</button>
+          <button class="btn btn-dark" type="button" id="buyNowBtn">Comprar ahora</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <aside class="drawer" id="cartDrawer" aria-modal="true" aria-hidden="true" role="dialog" aria-labelledby="cartTitle">
+    <div class="drawer-header">
+      <div>
+        <span class="tag">Tu pedido</span>
+        <h2 id="cartTitle">Carrito</h2>
+      </div>
+      <button class="close-btn" type="button" data-close-all aria-label="Cerrar carrito">×</button>
+    </div>
+    <div class="cart-list" id="cartList"></div>
+    <div class="drawer-footer">
+      <div class="total-row"><span>Total estimado</span><strong id="cartTotal">€0,00</strong></div>
+      <button class="btn btn-dark" type="button" id="checkoutBtn">Ir a checkout</button>
+      <button class="btn btn-muted" type="button" id="clearCartBtn">Vaciar carrito</button>
+    </div>
+  </aside>
+
+  <section class="checkout-panel" id="checkoutPanel" aria-modal="true" aria-hidden="true" role="dialog" aria-labelledby="checkoutTitle">
+    <div class="checkout-wrap">
+      <aside class="checkout-summary">
+        <div class="modal-topline">
+          <span class="tag" style="background:rgba(241,167,239,.22);color:var(--lavender-2)">Resumen</span>
+          <button class="close-btn" type="button" data-close-all aria-label="Cerrar checkout" style="background:rgba(255,255,255,.12);color:var(--cream)">×</button>
+        </div>
+        <h2>Tu pedido Rivela</h2>
+        <div class="summary-items" id="checkoutSummary"></div>
+        <div class="summary-total"><span>Total estimado</span><strong id="checkoutTotal">€0,00</strong></div>
+        <p class="form-note" style="color:rgba(255,250,240,.72)">Este prototipo no procesa pago. Al confirmar, abre WhatsApp con el pedido listo para enviar.</p>
+      </aside>
+
+      <div class="checkout-form" id="checkout">
+        <div>
+          <span class="section-kicker">Checkout</span>
+          <h2 id="checkoutTitle">Datos para preparar tu pedido</h2>
+        </div>
+        <form id="orderForm">
+          <div class="form-grid">
+            <div class="field">
+              <label for="customerName">Nombre completo</label>
+              <input id="customerName" name="Nombre" autocomplete="name" required placeholder="Ej. María Rivera" />
+            </div>
+            <div class="field">
+              <label for="customerPhone">Teléfono</label>
+              <input id="customerPhone" name="Teléfono" autocomplete="tel" required placeholder="Ej. +34 600 000 000" />
+            </div>
+            <div class="field">
+              <label for="deliveryType">Tipo de entrega</label>
+              <select id="deliveryType" name="Tipo de entrega" required>
+                <option value="Domicilio">Domicilio</option>
+                <option value="Recogida en tienda">Recogida en tienda</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="deliveryDate">Fecha deseada</label>
+              <input id="deliveryDate" name="Fecha deseada" type="date" required />
+            </div>
+            <div class="field field-full">
+              <label for="address">Dirección / punto de recogida</label>
+              <input id="address" name="Dirección" autocomplete="street-address" required placeholder="Calle, número, piso, referencia" />
+            </div>
+            <div class="field">
+              <label for="city">Ciudad</label>
+              <input id="city" name="Ciudad" autocomplete="address-level2" required placeholder="Ej. Madrid" />
+            </div>
+            <div class="field">
+              <label for="zone">Barrio / zona</label>
+              <input id="zone" name="Zona" placeholder="Ej. Chamberí" />
+            </div>
+            <div class="field field-full">
+              <div class="checkout-map-card">
+                <div class="map-copy">
+                  <div>
+                    <span class="section-kicker">Domicilio</span>
+                    <h3>Ubicación del domicilio</h3>
+                  </div>
+                  <a href="https://www.openstreetmap.org/" target="_blank" rel="noopener noreferrer" id="mapLink">Abrir mapa</a>
+                </div>
+                <div class="checkout-map" id="checkoutMap" aria-label="Mapa de la dirección de entrega"></div>
+                <button class="btn btn-outline map-check-btn" type="button" id="verifyAddressBtn">Verificar dirección</button>
+                <p class="map-status" id="mapStatus">Completa dirección, ciudad y barrio/zona; luego verifica la ubicación.</p>
+              </div>
+            </div>
+            <div class="field">
+              <label for="payment">Pago preferido</label>
+              <select id="payment" name="Pago preferido" required>
+                <option value="Transferencia">Transferencia</option>
+                <option value="Bizum">Bizum</option>
+                <option value="Efectivo">Efectivo</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="hour">Horario preferido</label>
+              <input id="hour" name="Horario preferido" placeholder="Ej. 16:00 - 18:00" />
+            </div>
+            <div class="field field-full">
+              <label for="notes">Notas del pedido</label>
+              <textarea id="notes" name="Notas" placeholder="Dedicatoria, alergias, detalles de empaque o instrucciones de entrega."></textarea>
+            </div>
+          </div>
+          <p class="form-note">El mensaje de WhatsApp incluirá el resumen del carrito, cantidades, total estimado y los datos de entrega.</p>
+          <div class="checkout-actions">
+            <button class="btn btn-outline" type="button" data-open-cart>Editar carrito</button>
+            <button class="btn btn-primary" type="submit">Enviar pedido por WhatsApp</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <div class="toast" id="toast">Producto agregado</div>
+
+  <footer class="site-footer">
+    <span>Rivela · Pastelería premium</span>
+    <span>Prototipo mobile-first con carrito y checkout vía WhatsApp.</span>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
+
+
+
