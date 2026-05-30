@@ -1,0 +1,92 @@
+[
+  {
+    "id": "tarta-frutos-rojos",
+    "category": "tartas",
+    "tag": "Tarta de autor",
+    "name": "Tarta Rivela de frutos rojos",
+    "price": 28,
+    "short": "Bizcocho suave, crema de vainilla y frutos rojos frescos.",
+    "description": "Una tarta protagonista para celebrar sin exceso: capas suaves, acidez delicada y acabado limpio con estética artesanal.",
+    "details": [
+      "Rinde de 6 a 8 porciones",
+      "Preparación bajo pedido",
+      "Disponible con empaque regalo"
+    ],
+    "visual": "cake"
+  },
+  {
+    "id": "brownie-cacao-nuez",
+    "category": "individuales",
+    "tag": "Individual",
+    "name": "Brownie de cacao & nuez",
+    "price": 3.8,
+    "short": "Denso, brillante y con nuez tostada.",
+    "description": "El brownie que funciona como producto de entrada: intenso, húmedo y fácil de sumar al carrito en varias unidades.",
+    "details": [
+      "Unidad individual",
+      "Ideal para café o regalo pequeño",
+      "Contiene frutos secos"
+    ],
+    "visual": "brownie"
+  },
+  {
+    "id": "cheesecake-vainilla",
+    "category": "individuales",
+    "tag": "Individual premium",
+    "name": "Cheesecake de vainilla",
+    "price": 5.5,
+    "short": "Base crocante y crema ligera con vainilla.",
+    "description": "Formato individual con acabado premium: textura cremosa, notas de vainilla y una presentación sobria para vitrina o delivery.",
+    "details": [
+      "Porción individual",
+      "Requiere refrigeración",
+      "Puede llevar topping de frutos rojos"
+    ],
+    "visual": "cheesecake"
+  },
+  {
+    "id": "gugelhupf-almendra",
+    "category": "tartas",
+    "tag": "Clásico europeo",
+    "name": "Gugelhupf de almendra",
+    "price": 18,
+    "short": "Miga aromática, almendra y azúcar suave.",
+    "description": "Un clásico de cafetería europea reinterpretado para Rivela: casero, elegante y perfecto para compartir.",
+    "details": [
+      "Rinde de 5 a 6 porciones",
+      "Acabado con azúcar glas",
+      "Disponible por encargo"
+    ],
+    "visual": "gugelhupf"
+  },
+  {
+    "id": "caja-rivela",
+    "category": "cajas",
+    "tag": "Caja regalo",
+    "name": "Caja selección Rivela",
+    "price": 24,
+    "short": "Mini dulces surtidos en empaque especial.",
+    "description": "Caja pensada para regalo o detalle corporativo: una selección equilibrada de mini piezas con empaque cuidado.",
+    "details": [
+      "Incluye 8 mini piezas",
+      "Permite dedicatoria corta",
+      "Empaque premium incluido"
+    ],
+    "visual": "box"
+  },
+  {
+    "id": "croissant-crema",
+    "category": "individuales",
+    "tag": "Mañana dulce",
+    "name": "Croissant de crema ligera",
+    "price": 4.2,
+    "short": "Hojaldre delicado con relleno de crema.",
+    "description": "Un producto cotidiano elevado por el acabado visual: hojaldre, crema suave y una capa final de azúcar sutil.",
+    "details": [
+      "Unidad individual",
+      "Mejor consumir el mismo día",
+      "Disponible hasta agotar producción"
+    ],
+    "visual": "croissant"
+  }
+]
