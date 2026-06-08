@@ -866,6 +866,9 @@
       width:100%;
       max-width:100%;
       min-width:0;
+      inline-size:100%;
+      max-inline-size:100%;
+      min-inline-size:0;
       border:1px solid rgba(67,24,25,.16);
       background:rgba(255,255,255,.76);
       border-radius:16px;
@@ -873,6 +876,25 @@
       color:var(--ink);
       outline:none;
       transition:border .18s ease, box-shadow .18s ease;
+    }
+    .field input[type="date"]{
+      -webkit-appearance:none;
+      appearance:none;
+      display:block;
+      min-width:0;
+      min-inline-size:0;
+      max-width:100%;
+      max-inline-size:100%;
+    }
+    .field input[type="date"]::-webkit-date-and-time-value{
+      min-width:0;
+      max-width:100%;
+      text-align:left;
+    }
+    .field input[type="date"]::-webkit-datetime-edit,
+    .field input[type="date"]::-webkit-datetime-edit-fields-wrapper{
+      min-width:0;
+      max-width:100%;
     }
     .field textarea{min-height:94px;resize:vertical}
     .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--wine);box-shadow:0 0 0 4px rgba(241,167,239,.22)}
@@ -914,10 +936,10 @@
     }
 
     @media (min-width:620px){
-      .product-grid{grid-template-columns:repeat(2, 1fr)}
-      .form-grid{grid-template-columns:repeat(2, 1fr)}
+      .product-grid{grid-template-columns:repeat(2, minmax(0, 1fr))}
+      .form-grid{grid-template-columns:repeat(2, minmax(0, 1fr))}
       .field-full{grid-column:1/-1}
-      .modal-actions,.checkout-actions{grid-template-columns:1fr 1fr}
+      .modal-actions,.checkout-actions{grid-template-columns:repeat(2, minmax(0, 1fr))}
       .custom-options{grid-template-columns:1fr}
     }
 
@@ -938,7 +960,7 @@
       .section{margin-top:4.8rem}
       .section-heading{grid-template-columns:minmax(18rem, .78fr) minmax(22rem, 1fr);align-items:end}
       .section-heading p{justify-self:end}
-      .product-grid{grid-template-columns:repeat(3, 1fr);gap:1.1rem}
+      .product-grid{grid-template-columns:repeat(3, minmax(0, 1fr));gap:1.1rem}
       .custom-cheesecake-card{grid-template-columns:1fr .82fr;padding:1.5rem 1.5rem 1.5rem 1.8rem}
       .custom-cheesecake-preview{min-height:320px}
       .story-band{grid-template-columns:minmax(20rem, .78fr) minmax(24rem, 1fr);align-items:center;padding:2rem 2.35rem;gap:2.2rem}
