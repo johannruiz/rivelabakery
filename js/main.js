@@ -197,6 +197,49 @@
       return `${year}-${month}-${day}`;
     }
 
+    function formatDateExample(value){
+      const [year, month, day] = String(value || '').split('-');
+      return year && month && day ? `${day}/${month}/${year}` : 'dd/mm/aaaa';
+    }
+
+    function updateDatePlaceholder(){
+      const deliveryDate = document.getElementById('deliveryDate');
+      const dateField = deliveryDate?.closest('.date-field');
+      if(!deliveryDate || !dateField) return;
+
+      const placeholder = dateField.querySelector('.date-placeholder');
+      if(placeholder) placeholder.textContent = `Ej. ${formatDateExample(deliveryDate.min || getTodayValue())}`;
+      dateField.classList.toggle('is-empty', !deliveryDate.value);
+    }
+
+    function openDatePicker(){
+      const deliveryDate = document.getElementById('deliveryDate');
+      if(!deliveryDate || typeof deliveryDate.showPicker !== 'function') return;
+      try{
+        deliveryDate.showPicker();
+      }catch(error){
+        deliveryDate.focus();
+      }
+    }
+
+    function handleDatePointer(event){
+      if(event.pointerType !== 'mouse') return;
+      event.preventDefault();
+      openDatePicker();
+    }
+
+    function blockDateTyping(event){
+      const allowedKeys = ['Tab', 'Escape', 'Enter', ' ', 'ArrowDown'];
+      if(allowedKeys.includes(event.key)){
+        if(event.key !== 'Tab' && event.key !== 'Escape'){
+          event.preventDefault();
+          openDatePicker();
+        }
+        return;
+      }
+      event.preventDefault();
+    }
+
     function setMinimumDeliveryDate(){
       const deliveryDate = document.getElementById('deliveryDate');
       if(!deliveryDate) return;
@@ -204,6 +247,7 @@
       const todayValue = getTodayValue();
       deliveryDate.min = todayValue;
       if(deliveryDate.value && deliveryDate.value < todayValue) deliveryDate.value = todayValue;
+      updateDatePlaceholder();
     }
 
     function pastrySvg(type){
@@ -754,9 +798,20 @@
 
     document.getElementById('clearCartBtn').addEventListener('click', clearCart);
     document.getElementById('checkoutBtn').addEventListener('click', openCheckout);
+    document.getElementById('deliveryDate').addEventListener('pointerdown', handleDatePointer);
+    document.getElementById('deliveryDate').addEventListener('click', openDatePicker);
+    document.getElementById('deliveryDate').addEventListener('keydown', blockDateTyping);
+    document.getElementById('deliveryDate').addEventListener('beforeinput', event => event.preventDefault());
+    document.getElementById('deliveryDate').addEventListener('paste', event => event.preventDefault());
 
-    document.getElementById('orderForm').addEventListener('input', saveCustomerData);
-    document.getElementById('orderForm').addEventListener('change', saveCustomerData);
+    document.getElementById('orderForm').addEventListener('input', () => {
+      saveCustomerData();
+      updateDatePlaceholder();
+    });
+    document.getElementById('orderForm').addEventListener('change', () => {
+      saveCustomerData();
+      updateDatePlaceholder();
+    });
     document.getElementById('orderForm').addEventListener('submit', event => {
       event.preventDefault();
       if(cartUnits() === 0){
