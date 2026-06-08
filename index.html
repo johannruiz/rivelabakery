@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Rivela — Catálogo premium</title>
-  <meta name="description" content="Catálogo mobile-first para una pastelería premium con carrito, detalle de producto y checkout vía WhatsApp." />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <title>Rivela Bakery</title>
+  <meta name="description" content="Rivela Bakery: pastelería artesanal premium con pedidos por encargo, cajas regalo y dulces para celebrar con calma." />
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
@@ -13,21 +13,30 @@
 
   <header class="site-header">
     <div class="header-inner">
-      <a href="#inicio" class="brand" aria-label="Rivela Home">
-        <span class="brand-mark">Rive<span class="script-l">l</span>a</span>
-        <span class="brand-subtitle">Pastelería premium</span>
+      <a href="#inicio" class="brand" aria-label="Rivela Bakery">
+        <img class="brand-logo" src="assets/rivelalogo.svg" alt="Rivela Bakery" />
       </a>
       <nav class="desktop-nav" aria-label="Navegación principal">
         <a href="#catalogo">Catálogo</a>
+        <a href="#crea-cheesecake">Crea tu cheesecake</a>
         <a href="#proceso">Proceso</a>
-        <button type="button" data-open-checkout>Pedido</button>
       </nav>
+      <button class="menu-toggle" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobileMenu" data-menu-toggle>
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
       <button class="header-cart" type="button" data-open-cart aria-label="Abrir carrito">
         <span>🛒</span>
         <span class="cart-text">Carrito</span>
         <span class="cart-count" data-cart-count>0</span>
       </button>
     </div>
+    <nav class="mobile-menu" id="mobileMenu" aria-label="Menú móvil">
+      <a href="#catalogo">Catálogo</a>
+      <a href="#crea-cheesecake">Crea tu cheesecake</a>
+      <a href="#proceso">Proceso</a>
+    </nav>
   </header>
 
   <main id="inicio">
@@ -36,7 +45,7 @@
         <div class="hero-content">
           <span class="eyebrow">Horneado artesanal · Detalle premium</span>
           <h1 id="hero-title">Dulces con memoria, diseño y <span>calma</span>.</h1>
-          <p>Un catálogo pensado para elegir postres de autor, revisar cada detalle, armar tu pedido y enviarlo por WhatsApp sin procesos innecesarios.</p>
+          <p>Pastelería artesanal para regalos, celebraciones y antojos especiales. Elige tus favoritos y cuéntanos por WhatsApp cómo quieres recibirlos.</p>
           <div class="hero-actions">
             <a class="btn btn-primary" href="#catalogo">Ver catálogo</a>
             <button class="btn btn-secondary" type="button" data-open-cart>Revisar carrito</button>
@@ -63,15 +72,15 @@
       <aside class="quick-panel" aria-label="Beneficios de compra">
         <div class="mini-row">
           <div class="mini-icon">✦</div>
-          <div><h3>Catálogo directo</h3><p>Productos, precios y detalle sin fricción.</p></div>
+          <div><h3>Hecho por encargo</h3><p>Preparamos cada pedido con tiempos cuidados y acabado artesanal.</p></div>
         </div>
         <div class="mini-row">
           <div class="mini-icon">↗</div>
-          <div><h3>Pedido por WhatsApp</h3><p>El checkout arma el mensaje con todos los datos.</p></div>
+          <div><h3>Pedido por WhatsApp</h3><p>Recibimos tus datos para confirmar disponibilidad, entrega y pago.</p></div>
         </div>
         <div class="mini-row">
           <div class="mini-icon">♡</div>
-          <div><h3>Estética Rivela</h3><p>Lavanda, vino, crema, empaques y trazos suaves.</p></div>
+          <div><h3>Detalles para regalar</h3><p>Empaques delicados, dedicatorias y sabores pensados para compartir.</p></div>
         </div>
       </aside>
     </section>
@@ -82,7 +91,7 @@
           <span class="section-kicker">Catálogo</span>
           <h2 id="catalog-title">Elige tu próximo antojo.</h2>
         </div>
-        <p>Diseño mobile-first: en celular funciona como catálogo rápido; en desktop mantiene una grilla amplia y visual para explorar mejor cada producto.</p>
+        <p>Postres, cajas y dulces artesanales preparados bajo pedido. Revisa sabores, porciones y precios antes de enviar tu solicitud.</p>
       </div>
 
       <div class="filters" aria-label="Filtros de catálogo">
@@ -95,17 +104,33 @@
       <div class="product-grid" id="productGrid"></div>
     </section>
 
+    <section class="section" id="crea-cheesecake" aria-labelledby="custom-cheesecake-title">
+      <div class="custom-cheesecake-card">
+        <div class="custom-cheesecake-copy">
+          <span class="section-kicker">Crea tu cheesecake</span>
+          <h2 id="custom-cheesecake-title">Arma una combinación a tu gusto.</h2>
+          <p>Elige base, sabor y topping. Lo agregaremos como pedido personalizado para confirmarlo contigo por WhatsApp.</p>
+          <button class="btn btn-primary" type="button" data-open-cheesecake>Personalizar cheesecake</button>
+        </div>
+        <button class="custom-cheesecake-preview" type="button" data-open-cheesecake aria-label="Personalizar cheesecake">
+          <div class="custom-cheesecake-plate" aria-hidden="true">
+            <span></span>
+          </div>
+        </button>
+      </div>
+    </section>
+
     <section class="section" id="proceso">
       <div class="story-band">
         <div>
           <span class="section-kicker" style="color:var(--lavender-2)">Cómo funciona</span>
-          <h2>Un pedido simple, con sensación de marca cuidada.</h2>
-          <p>La experiencia evita parecer una tienda genérica: cada paso conserva el carácter artesanal y cálido de Rivela, pero con una estructura suficientemente clara para vender.</p>
+          <h2>Una forma sencilla de pedir algo especial.</h2>
+          <p>Selecciona tus productos, agrega los datos de entrega y envíanos tu pedido. Te confirmaremos disponibilidad, tiempos y medios de pago por WhatsApp.</p>
         </div>
         <div class="story-features">
-          <div class="story-feature"><b>1</b><span><b>Explorar.</b><br>El usuario ve nombre, precio y una imagen de producto coherente con la identidad.</span></div>
-          <div class="story-feature"><b>2</b><span><b>Elegir.</b><br>Al abrir el detalle puede cambiar cantidad, agregar al carrito o comprar de inmediato.</span></div>
-          <div class="story-feature"><b>3</b><span><b>Enviar.</b><br>El checkout genera un mensaje de WhatsApp con productos, domicilio y datos personales.</span></div>
+          <div class="story-feature"><b>1</b><span><b>Explora.</b><br>Conoce nuestras preparaciones, precios y detalles de cada producto.</span></div>
+          <div class="story-feature"><b>2</b><span><b>Elige.</b><br>Agrega al carrito las unidades que quieres para tu pedido o regalo.</span></div>
+          <div class="story-feature"><b>3</b><span><b>Confirma.</b><br>Envíanos la solicitud por WhatsApp y coordinamos contigo la entrega.</span></div>
         </div>
       </div>
     </section>
@@ -128,12 +153,12 @@
         </div>
         <div>
           <h2 id="modalTitle">Producto</h2>
-          <div class="price" id="modalPrice">€0,00</div>
+          <div class="price" id="modalPrice">$0</div>
         </div>
         <p id="modalDescription"></p>
         <ul class="detail-list" id="modalDetails"></ul>
-        <div class="qty-box">
-          <span>Cantidad</span>
+        <div class="qty-box product-quantity-box">
+          <span>Cantidad del cheesecake</span>
           <div class="qty-control">
             <button type="button" data-detail-minus aria-label="Restar cantidad">−</button>
             <span class="qty-value" id="detailQty">1</span>
@@ -142,7 +167,50 @@
         </div>
         <div class="modal-actions">
           <button class="btn btn-outline" type="button" id="addToCartBtn">Agregar al carrito</button>
-          <button class="btn btn-dark" type="button" id="buyNowBtn">Comprar ahora</button>
+          <button class="btn btn-dark" type="button" id="buyNowBtn">Pedir ahora</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="modal cheesecake-modal" id="cheesecakeModal" aria-modal="true" aria-hidden="true" role="dialog" aria-labelledby="cheesecakeModalTitle">
+    <div class="modal-inner cheesecake-modal-inner">
+      <div class="modal-media" id="cheesecakePreview"></div>
+      <div class="modal-body">
+        <div class="modal-topline">
+          <span class="tag">Personalizado</span>
+          <button class="close-btn" type="button" data-close-all aria-label="Cerrar">×</button>
+        </div>
+        <div>
+          <h2 id="cheesecakeModalTitle">Crea tu cheesecake</h2>
+          <div class="price" id="cheesecakePrice">Precio por confirmar</div>
+        </div>
+        <p>Selecciona una combinación y la sumamos al carrito para coordinar disponibilidad y detalles finales por WhatsApp.</p>
+        <div class="custom-options">
+          <div class="field">
+            <label for="cheesecakeBase">Base</label>
+            <select id="cheesecakeBase" required></select>
+          </div>
+          <div class="field">
+            <label for="cheesecakeFlavor">Sabor</label>
+            <select id="cheesecakeFlavor" required></select>
+          </div>
+          <div class="field field-full">
+            <label>Toppings opcionales</label>
+            <div class="topping-list" id="cheesecakeToppings"></div>
+          </div>
+        </div>
+        <div class="qty-box">
+          <span>Cantidad</span>
+          <div class="qty-control">
+            <button type="button" id="cheesecakeMinus" aria-label="Restar cantidad">−</button>
+            <span class="qty-value" id="cheesecakeQty">1</span>
+            <button type="button" id="cheesecakePlus" aria-label="Sumar cantidad">+</button>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-outline" type="button" id="addCustomCheesecakeBtn">Agregar al carrito</button>
+          <button class="btn btn-dark" type="button" id="orderCustomCheesecakeBtn">Pedir ahora</button>
         </div>
       </div>
     </div>
@@ -158,8 +226,8 @@
     </div>
     <div class="cart-list" id="cartList"></div>
     <div class="drawer-footer">
-      <div class="total-row"><span>Total estimado</span><strong id="cartTotal">€0,00</strong></div>
-      <button class="btn btn-dark" type="button" id="checkoutBtn">Ir a checkout</button>
+      <div class="total-row"><span>Total estimado</span><strong id="cartTotal">$0</strong></div>
+      <button class="btn btn-dark" type="button" id="checkoutBtn">Finalizar pedido</button>
       <button class="btn btn-muted" type="button" id="clearCartBtn">Vaciar carrito</button>
     </div>
   </aside>
@@ -169,17 +237,17 @@
       <aside class="checkout-summary">
         <div class="modal-topline">
           <span class="tag" style="background:rgba(241,167,239,.22);color:var(--lavender-2)">Resumen</span>
-          <button class="close-btn" type="button" data-close-all aria-label="Cerrar checkout" style="background:rgba(255,255,255,.12);color:var(--cream)">×</button>
+          <button class="close-btn" type="button" data-close-all aria-label="Cerrar pedido" style="background:rgba(255,255,255,.12);color:var(--cream)">×</button>
         </div>
         <h2>Tu pedido Rivela</h2>
         <div class="summary-items" id="checkoutSummary"></div>
-        <div class="summary-total"><span>Total estimado</span><strong id="checkoutTotal">€0,00</strong></div>
-        <p class="form-note" style="color:rgba(255,250,240,.72)">Este prototipo no procesa pago. Al confirmar, abre WhatsApp con el pedido listo para enviar.</p>
+        <div class="summary-total"><span>Total estimado</span><strong id="checkoutTotal">$0</strong></div>
+        <p class="form-note" style="color:rgba(255,250,240,.72)">Al confirmar, se abrirá WhatsApp con tu solicitud lista para enviar. Te responderemos para coordinar disponibilidad, entrega y pago.</p>
       </aside>
 
       <div class="checkout-form" id="checkout">
         <div>
-          <span class="section-kicker">Checkout</span>
+          <span class="section-kicker">Pedido</span>
           <h2 id="checkoutTitle">Datos para preparar tu pedido</h2>
         </div>
         <form id="orderForm">
@@ -190,14 +258,11 @@
             </div>
             <div class="field">
               <label for="customerPhone">Teléfono</label>
-              <input id="customerPhone" name="Teléfono" autocomplete="tel" required placeholder="Ej. +34 600 000 000" />
+              <input id="customerPhone" name="Teléfono" autocomplete="tel" required placeholder="Ej. 315 000 0000" />
             </div>
             <div class="field">
               <label for="deliveryType">Tipo de entrega</label>
-              <select id="deliveryType" name="Tipo de entrega" required>
-                <option value="Domicilio">Domicilio</option>
-                <option value="Recogida en tienda">Recogida en tienda</option>
-              </select>
+              <select id="deliveryType" name="Tipo de entrega" required></select>
             </div>
             <div class="field">
               <label for="deliveryDate">Fecha deseada</label>
@@ -209,37 +274,19 @@
             </div>
             <div class="field">
               <label for="city">Ciudad</label>
-              <input id="city" name="Ciudad" autocomplete="address-level2" required placeholder="Ej. Madrid" />
+              <input id="city" name="Ciudad" autocomplete="address-level2" required placeholder="Ej. Floridablanca" />
             </div>
             <div class="field">
               <label for="zone">Barrio / zona</label>
-              <input id="zone" name="Zona" placeholder="Ej. Chamberí" />
-            </div>
-            <div class="field field-full">
-              <div class="checkout-map-card">
-                <div class="map-copy">
-                  <div>
-                    <span class="section-kicker">Domicilio</span>
-                    <h3>Ubicación del domicilio</h3>
-                  </div>
-                  <a href="https://www.openstreetmap.org/" target="_blank" rel="noopener noreferrer" id="mapLink">Abrir mapa</a>
-                </div>
-                <div class="checkout-map" id="checkoutMap" aria-label="Mapa de la dirección de entrega"></div>
-                <button class="btn btn-outline map-check-btn" type="button" id="verifyAddressBtn">Verificar dirección</button>
-                <p class="map-status" id="mapStatus">Completa dirección, ciudad y barrio/zona; luego verifica la ubicación.</p>
-              </div>
+              <input id="zone" name="Zona" placeholder="Ej. Ciudad Valencia" />
             </div>
             <div class="field">
               <label for="payment">Pago preferido</label>
-              <select id="payment" name="Pago preferido" required>
-                <option value="Transferencia">Transferencia</option>
-                <option value="Bizum">Bizum</option>
-                <option value="Efectivo">Efectivo</option>
-              </select>
+              <select id="payment" name="Pago preferido" required></select>
             </div>
             <div class="field">
               <label for="hour">Horario preferido</label>
-              <input id="hour" name="Horario preferido" placeholder="Ej. 16:00 - 18:00" />
+              <select id="hour" name="Horario preferido" required></select>
             </div>
             <div class="field field-full">
               <label for="notes">Notas del pedido</label>
@@ -259,11 +306,10 @@
   <div class="toast" id="toast">Producto agregado</div>
 
   <footer class="site-footer">
-    <span>Rivela · Pastelería premium</span>
-    <span>Prototipo mobile-first con carrito y checkout vía WhatsApp.</span>
+    <span>Rivela Bakery · Pastelería premium</span>
+    <span>Pedidos por encargo, cajas regalo y dulces artesanales.</span>
   </footer>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

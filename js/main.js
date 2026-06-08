@@ -3,6 +3,7 @@
 
     const PRODUCTS_URL = 'data/products.json';
     const CUSTOMER_STORAGE_KEY = 'rivelaCustomerData';
+    const CUSTOM_PRODUCTS_STORAGE_KEY = 'rivelaCustomProducts';
     const CUSTOMER_FIELD_IDS = [
       'customerName',
       'customerPhone',
@@ -14,44 +15,63 @@
       'hour'
     ];
     let products = [];
+    let storeSettings = {
+      promoBanner:[
+        { text:'Promo de temporada · ' },
+        { text:'15% OFF', highlight:true },
+        { text:' en cajas regalo y tartas seleccionadas · Pedidos por WhatsApp' }
+      ],
+      deliveryTypes:['Domicilio'],
+      paymentMethods:['Transferencia bancaria', 'Nequi', 'Daviplata', 'Efectivo'],
+      timeSlots:['9:00 a. m.', '9:30 a. m.', '10:00 a. m.', '10:30 a. m.', '11:00 a. m.', '11:30 a. m.', '12:00 p. m.', '12:30 p. m.', '1:00 p. m.', '1:30 p. m.', '2:00 p. m.', '2:30 p. m.', '3:00 p. m.', '3:30 p. m.', '4:00 p. m.', '4:30 p. m.', '5:00 p. m.', '5:30 p. m.', '6:00 p. m.'],
+      cheesecakeBuilder:{
+        name:'Cheesecake personalizado',
+        tag:'Crea tu cheesecake',
+        defaultVisual:'cheesecake',
+        bases:[{ name:'Clasico', price:45000 }],
+        flavors:[{ name:'Frutos rojos', price:8000 }, { name:'Ferrero', price:12000 }, { name:'Cookies & Cream', price:10000 }],
+        toppings:[{ name:'Mix frutos rojos', price:6000 }, { name:'Oreo triturado', price:4000 }, { name:'Mani', price:3000 }, { name:'Ferrero', price:8000 }],
+        combinationImages:[]
+      }
+    };
+    let customProducts = JSON.parse(localStorage.getItem(CUSTOM_PRODUCTS_STORAGE_KEY) || '[]');
 
     const state = {
       filter:'all',
       cart: JSON.parse(localStorage.getItem('rivelaCart') || '{}'),
       activeProduct:null,
-      detailQty:1
+      detailQty:1,
+      cheesecakeQty:1,
+      editingCustomId:null
     };
 
     const productGrid = document.getElementById('productGrid');
     const overlay = document.getElementById('overlay');
     const modal = document.getElementById('productModal');
+    const cheesecakeModal = document.getElementById('cheesecakeModal');
     const cartDrawer = document.getElementById('cartDrawer');
     const checkoutPanel = document.getElementById('checkoutPanel');
     const toast = document.getElementById('toast');
-    const mapStatus = document.getElementById('mapStatus');
-    const mapLink = document.getElementById('mapLink');
-    const verifyAddressBtn = document.getElementById('verifyAddressBtn');
+    const topPromo = document.querySelector('.top-promo');
+    const siteHeader = document.querySelector('.site-header');
+    const menuToggle = document.querySelector('[data-menu-toggle]');
 
-    const currency = new Intl.NumberFormat('es-ES', { style:'currency', currency:'EUR' });
-    const formatPrice = value => currency.format(value);
-    const getProduct = id => products.find(product => product.id === id);
+    const formatPrice = value => `$${Number(value || 0).toLocaleString('es-CO', { maximumFractionDigits:0 })}`;
+    const getProduct = id => [...products, ...customProducts].find(product => product.id === id);
+    const productPriceLabel = product => product.price > 0 ? formatPrice(product.price) : product.priceLabel || 'Precio por confirmar';
+    const productLineTotal = (product, qty) => product.price > 0 ? formatPrice(product.price * qty) : product.priceLabel || 'Precio por confirmar';
     const cartEntries = () => Object.entries(state.cart).map(([id, qty]) => ({ product:getProduct(id), qty })).filter(item => item.product && item.qty > 0);
     const cartTotal = () => cartEntries().reduce((sum, item) => sum + item.product.price * item.qty, 0);
     const cartUnits = () => cartEntries().reduce((sum, item) => sum + item.qty, 0);
-    let checkoutMap = null;
-    let checkoutMarker = null;
-    let geocodeRequestId = 0;
-    let deliveryLocation = null;
-    const DEFAULT_MAP_CENTER = [7.0621, -73.0864];
-    const DEFAULT_MAP_ZOOM = 13;
 
     async function loadProducts(){
       try{
         const response = await fetch(PRODUCTS_URL);
         if(!response.ok) throw new Error(`No se pudo leer ${PRODUCTS_URL}`);
         const data = await response.json();
-        if(!Array.isArray(data)) throw new Error('El archivo de productos debe ser una lista.');
-        products = data;
+        products = Array.isArray(data) ? data : data.products;
+        storeSettings = Array.isArray(data) ? storeSettings : { ...storeSettings, ...(data.settings || {}) };
+        if(!Array.isArray(products)) throw new Error('El archivo de productos debe incluir una lista en "products".');
       }catch(error){
         productGrid.innerHTML = `
           <div class="cart-empty">
@@ -61,6 +81,129 @@
         `;
         console.error(error);
       }
+    }
+
+    function fillSelect(id, options, placeholder){
+      const select = document.getElementById(id);
+      if(!select) return;
+
+      const validOptions = (Array.isArray(options) ? options : [])
+        .map(normalizePricedOption)
+        .filter(option => option.name);
+
+      select.innerHTML = [
+        `<option value="">${escapeHtml(placeholder)}</option>`,
+        ...validOptions.map(option => `<option value="${escapeHtml(option.name)}">${escapeHtml(formatOptionLabel(option))}</option>`)
+      ].join('');
+    }
+
+    function normalizePricedOption(option){
+      if(typeof option === 'string') return { name:option.trim(), price:0 };
+      return {
+        name:String(option?.name || '').trim(),
+        price:Number(option?.price || 0)
+      };
+    }
+
+    function getOptionByName(options, name){
+      return (Array.isArray(options) ? options : [])
+        .map(normalizePricedOption)
+        .find(option => normalizeOption(option.name) === normalizeOption(name)) || { name, price:0 };
+    }
+
+    function formatOptionLabel(option){
+      return option.price > 0 ? `${option.name} · ${formatPrice(option.price)}` : option.name;
+    }
+
+    function selectFirstOption(id){
+      const select = document.getElementById(id);
+      if(select && !select.value && select.options.length > 1){
+        select.selectedIndex = 1;
+      }
+    }
+
+    function escapeHtml(value){
+      return String(value).replace(/[&<>"']/g, character => ({
+        '&':'&amp;',
+        '<':'&lt;',
+        '>':'&gt;',
+        '"':'&quot;',
+        "'":'&#039;'
+      })[character]);
+    }
+
+    function renderCheckoutOptions(){
+      fillSelect('deliveryType', storeSettings.deliveryTypes, 'Selecciona entrega');
+      fillSelect('payment', storeSettings.paymentMethods, 'Selecciona pago');
+      fillSelect('hour', storeSettings.timeSlots, 'Selecciona horario');
+    }
+
+    function renderCheesecakeOptions(){
+      const builder = getCheesecakeBuilder();
+      fillSelect('cheesecakeBase', builder.bases, 'Selecciona base');
+      fillSelect('cheesecakeFlavor', builder.flavors, 'Selecciona sabor');
+      renderCheesecakeToppings();
+      selectFirstOption('cheesecakeBase');
+      selectFirstOption('cheesecakeFlavor');
+      updateCheesecakePreview();
+    }
+
+    function renderCheesecakeToppings(selectedToppings = []){
+      const container = document.getElementById('cheesecakeToppings');
+      if(!container) return;
+
+      const builder = getCheesecakeBuilder();
+      const selectedByName = new Map(selectedToppings.map(item => [normalizeOption(item.name), Number(item.qty || 0)]));
+      const toppings = (builder.toppings || []).map(normalizePricedOption).filter(option => option.name);
+
+      container.innerHTML = toppings.map(option => {
+        const qty = selectedByName.get(normalizeOption(option.name)) || 0;
+        return `
+          <div class="topping-option">
+            <div>
+              <strong>${escapeHtml(option.name)}</strong>
+              <span>${option.price > 0 ? formatPrice(option.price) : 'Sin costo adicional'}</span>
+            </div>
+            <div class="qty-control topping-qty">
+              <button type="button" data-topping-minus="${escapeHtml(option.name)}" aria-label="Restar ${escapeHtml(option.name)}">−</button>
+              <span class="qty-value" data-topping-qty="${escapeHtml(option.name)}">${qty}</span>
+              <button type="button" data-topping-plus="${escapeHtml(option.name)}" aria-label="Sumar ${escapeHtml(option.name)}">+</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderPromoBanner(){
+      if(!topPromo) return;
+
+      const bannerParts = Array.isArray(storeSettings.promoBanner)
+        ? storeSettings.promoBanner
+        : [{ text:String(storeSettings.promoBanner || '') }];
+
+      topPromo.innerHTML = bannerParts
+        .map(part => {
+          const text = escapeHtml(typeof part === 'string' ? part : part.text || '');
+          return part.highlight ? `<strong>${text}</strong>` : text;
+        })
+        .join('');
+    }
+
+    function getTodayValue(){
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const day = String(today.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    function setMinimumDeliveryDate(){
+      const deliveryDate = document.getElementById('deliveryDate');
+      if(!deliveryDate) return;
+
+      const todayValue = getTodayValue();
+      deliveryDate.min = todayValue;
+      if(deliveryDate.value && deliveryDate.value < todayValue) deliveryDate.value = todayValue;
     }
 
     function pastrySvg(type){
@@ -75,17 +218,149 @@
       return base[type] || base.cake;
     }
 
+    function isImageVisual(visual){
+      return /\.(avif|webp|png|jpe?g|gif|svg)$/i.test(String(visual || ''));
+    }
+
+    function productVisual(product){
+      if(isImageVisual(product.visual)){
+        const imagePath = `assets/images/${encodeURIComponent(product.visual)}`;
+        return `<div class="product-photo-fallback">${pastrySvg('cheesecake')}</div><img class="product-photo" src="${imagePath}" alt="${escapeHtml(product.name)}" loading="lazy" onerror="this.hidden=true" />`;
+      }
+
+      return pastrySvg(product.visual);
+    }
+
+    function getCheesecakeBuilder(){
+      return storeSettings.cheesecakeBuilder || {};
+    }
+
+    function normalizeOption(value){
+      return String(value || '').trim().toLowerCase();
+    }
+
+    function getCheesecakeSelection(){
+      const builder = getCheesecakeBuilder();
+      const baseName = document.getElementById('cheesecakeBase')?.value || '';
+      const flavorName = document.getElementById('cheesecakeFlavor')?.value || '';
+      const toppings = [...document.querySelectorAll('[data-topping-qty]')]
+        .map(item => {
+          const name = item.dataset.toppingQty;
+          const qty = Number(item.textContent || 0);
+          const option = getOptionByName(builder.toppings, name);
+          return { name, qty, price:option.price };
+        })
+        .filter(item => item.qty > 0);
+
+      return {
+        base:baseName,
+        flavor:flavorName,
+        basePrice:getOptionByName(builder.bases, baseName).price,
+        flavorPrice:getOptionByName(builder.flavors, flavorName).price,
+        toppings
+      };
+    }
+
+    function getCheesecakeTotal(selection = getCheesecakeSelection()){
+      return Number(selection.basePrice || 0) +
+        Number(selection.flavorPrice || 0) +
+        selection.toppings.reduce((sum, item) => sum + Number(item.price || 0) * Number(item.qty || 0), 0);
+    }
+
+    function getCheesecakeVisual(){
+      const builder = getCheesecakeBuilder();
+      const selection = getCheesecakeSelection();
+      const match = (builder.combinationImages || []).find(item =>
+        normalizeOption(item.base) === normalizeOption(selection.base) &&
+        normalizeOption(item.flavor) === normalizeOption(selection.flavor) &&
+        (!item.topping || selection.toppings.some(topping => normalizeOption(topping.name) === normalizeOption(item.topping)))
+      );
+      return match?.visual || builder.defaultVisual || 'cheesecake';
+    }
+
+    function updateCheesecakePreview(){
+      const preview = document.getElementById('cheesecakePreview');
+      if(!preview) return;
+
+      const builder = getCheesecakeBuilder();
+      const previewProduct = {
+        name:builder.name || 'Cheesecake personalizado',
+        visual:getCheesecakeVisual()
+      };
+      preview.innerHTML = productVisual(previewProduct);
+      document.getElementById('cheesecakePrice').textContent = formatPrice(getCheesecakeTotal());
+    }
+
+    function persistCustomProducts(){
+      localStorage.setItem(CUSTOM_PRODUCTS_STORAGE_KEY, JSON.stringify(customProducts));
+    }
+
+    function createCustomCheesecakeProduct(){
+      const builder = getCheesecakeBuilder();
+      const selection = getCheesecakeSelection();
+      const toppingText = selection.toppings.length
+        ? selection.toppings.map(item => `${item.qty}x ${item.name}`).join(', ')
+        : 'sin toppings';
+      const nameSuffix = `${selection.flavor} · ${toppingText}`;
+      const id = state.editingCustomId || `cheesecake-personalizado-${Date.now()}`;
+      return {
+        id,
+        category:'personalizados',
+        tag:builder.tag || 'Crea tu cheesecake',
+        name:`${builder.name || 'Cheesecake personalizado'} - ${nameSuffix}`,
+        price:getCheesecakeTotal(selection),
+        isCustom:true,
+        customSelection:selection,
+        short:`Base ${selection.base}, sabor ${selection.flavor}, toppings ${toppingText}.`,
+        description:'Cheesecake personalizado creado desde la web de Rivela Bakery.',
+        details:[
+          `Base: ${selection.base} (${formatPrice(selection.basePrice)})`,
+          `Sabor: ${selection.flavor} (${formatPrice(selection.flavorPrice)})`,
+          `Toppings: ${toppingText}`,
+          `Total unitario: ${formatPrice(getCheesecakeTotal(selection))}`
+        ],
+        visual:getCheesecakeVisual()
+      };
+    }
+
+    function addCustomCheesecake(openCartAfter = false){
+      const selection = getCheesecakeSelection();
+      if(!selection.base || !selection.flavor){
+        showToast('Completa base y sabor');
+        return;
+      }
+
+      const wasEditing = Boolean(state.editingCustomId);
+      const product = createCustomCheesecakeProduct();
+      const existingIndex = customProducts.findIndex(item => item.id === product.id);
+      if(existingIndex >= 0) customProducts[existingIndex] = product;
+      else customProducts.push(product);
+      persistCustomProducts();
+      if(state.editingCustomId){
+        state.cart[product.id] = state.cheesecakeQty;
+        persistCart();
+        renderCart();
+        updateCartBadges();
+        showToast('Cheesecake actualizado');
+      }else{
+        addToCart(product.id, state.cheesecakeQty);
+      }
+      state.editingCustomId = null;
+      closeAll();
+      if(openCartAfter || wasEditing) openCart();
+    }
+
     function renderProducts(){
       const visible = products.filter(product => state.filter === 'all' || product.category === state.filter);
       productGrid.innerHTML = visible.map(product => `
         <article class="product-card">
           <button class="product-button" type="button" data-product-id="${product.id}" aria-label="Ver detalle de ${product.name}">
-            <div class="product-media">${pastrySvg(product.visual)}</div>
+            <div class="product-media">${productVisual(product)}</div>
             <div class="product-info">
               <span class="tag">${product.tag}</span>
               <div class="product-title-row">
                 <h3>${product.name}</h3>
-                <span class="price">${formatPrice(product.price)}</span>
+                <span class="price">${productPriceLabel(product)}</span>
               </div>
               <p>${product.short}</p>
               <div class="product-meta"><span>Bajo pedido</span><span>Empaque Rivela</span></div>
@@ -96,19 +371,33 @@
     }
 
     function openOverlay(){
+      closeMobileMenu();
       overlay.classList.add('is-open');
       document.body.classList.add('no-scroll');
+    }
+
+    function closeMobileMenu(){
+      siteHeader?.classList.remove('is-menu-open');
+      menuToggle?.setAttribute('aria-expanded', 'false');
+    }
+
+    function toggleMobileMenu(){
+      const isOpen = siteHeader?.classList.toggle('is-menu-open');
+      menuToggle?.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
     }
 
     function closeAll(){
       overlay.classList.remove('is-open');
       modal.classList.remove('is-open');
+      cheesecakeModal.classList.remove('is-open');
       cartDrawer.classList.remove('is-open');
       checkoutPanel.classList.remove('is-open');
       modal.setAttribute('aria-hidden','true');
+      cheesecakeModal.setAttribute('aria-hidden','true');
       cartDrawer.setAttribute('aria-hidden','true');
       checkoutPanel.setAttribute('aria-hidden','true');
       document.body.classList.remove('no-scroll');
+      state.editingCustomId = null;
     }
 
     function openProduct(id){
@@ -116,14 +405,16 @@
       if(!product) return;
       cartDrawer.classList.remove('is-open');
       checkoutPanel.classList.remove('is-open');
+      cheesecakeModal.classList.remove('is-open');
       cartDrawer.setAttribute('aria-hidden','true');
       checkoutPanel.setAttribute('aria-hidden','true');
+      cheesecakeModal.setAttribute('aria-hidden','true');
       state.activeProduct = product;
       state.detailQty = 1;
-      document.getElementById('modalMedia').innerHTML = pastrySvg(product.visual);
+      document.getElementById('modalMedia').innerHTML = productVisual(product);
       document.getElementById('modalTag').textContent = product.tag;
       document.getElementById('modalTitle').textContent = product.name;
-      document.getElementById('modalPrice').textContent = formatPrice(product.price);
+      document.getElementById('modalPrice').textContent = productPriceLabel(product);
       document.getElementById('modalDescription').textContent = product.description;
       document.getElementById('modalDetails').innerHTML = product.details.map(detail => `<li>${detail}</li>`).join('');
       document.getElementById('detailQty').textContent = state.detailQty;
@@ -134,6 +425,48 @@
 
     function persistCart(){
       localStorage.setItem('rivelaCart', JSON.stringify(state.cart));
+    }
+
+    function setSelectValue(id, value){
+      const select = document.getElementById(id);
+      if(select) select.value = value || '';
+    }
+
+    function getToppingQtyElement(name){
+      return [...document.querySelectorAll('[data-topping-qty]')]
+        .find(item => item.dataset.toppingQty === name);
+    }
+
+    function setToppingQty(name, qty){
+      const item = getToppingQtyElement(name);
+      if(item) item.textContent = Math.max(0, Number(qty || 0));
+    }
+
+    function openCheesecakeModal(productId = null){
+      const editingProduct = productId ? getProduct(productId) : null;
+      state.editingCustomId = editingProduct?.isCustom ? productId : null;
+      state.cheesecakeQty = state.editingCustomId ? (state.cart[productId] || 1) : 1;
+      document.getElementById('cheesecakeQty').textContent = state.cheesecakeQty;
+      renderCheesecakeOptions();
+
+      if(editingProduct?.customSelection){
+        setSelectValue('cheesecakeBase', editingProduct.customSelection.base);
+        setSelectValue('cheesecakeFlavor', editingProduct.customSelection.flavor);
+        renderCheesecakeToppings(editingProduct.customSelection.toppings || []);
+        updateCheesecakePreview();
+      }
+
+      document.getElementById('addCustomCheesecakeBtn').textContent = state.editingCustomId ? 'Guardar cambios' : 'Agregar al carrito';
+      document.getElementById('orderCustomCheesecakeBtn').textContent = state.editingCustomId ? 'Guardar y ver carrito' : 'Pedir ahora';
+      openOverlay();
+      modal.classList.remove('is-open');
+      cartDrawer.classList.remove('is-open');
+      checkoutPanel.classList.remove('is-open');
+      modal.setAttribute('aria-hidden','true');
+      cartDrawer.setAttribute('aria-hidden','true');
+      checkoutPanel.setAttribute('aria-hidden','true');
+      cheesecakeModal.classList.add('is-open');
+      cheesecakeModal.setAttribute('aria-hidden','false');
     }
 
     function getCustomerFields(){
@@ -161,220 +494,21 @@
       localStorage.setItem(CUSTOMER_STORAGE_KEY, JSON.stringify(customerData));
     }
 
-    function setMapStatus(message){
-      if(mapStatus) mapStatus.textContent = message;
-    }
+    function validateDeliveryDate(){
+      const deliveryDate = document.getElementById('deliveryDate');
+      if(!deliveryDate) return true;
 
-    function escapeHtml(value){
-      return String(value).replace(/[&<>"']/g, character => ({
-        '&':'&amp;',
-        '<':'&lt;',
-        '>':'&gt;',
-        '"':'&quot;',
-        "'":'&#039;'
-      })[character]);
-    }
+      const todayValue = getTodayValue();
+      deliveryDate.min = todayValue;
 
-    function getAddressParts(){
-      return {
-        address:document.getElementById('address')?.value.trim() || '',
-        zone:document.getElementById('zone')?.value.trim() || '',
-        city:document.getElementById('city')?.value.trim() || ''
-      };
-    }
-
-    function normalizeColombianAddress(value){
-      return value
-        .trim()
-        .replace(/\s+/g, ' ')
-        .replace(/\bcalle\b/ig, 'Cl.')
-        .replace(/\bcarrera\b/ig, 'Cra.')
-        .replace(/\bavenida\b/ig, 'Av.')
-        .replace(/\btransversal\b/ig, 'Tv.')
-        .replace(/\bdiagonal\b/ig, 'Dg.')
-        .replace(/\s*#\s*/g, ' # ')
-        .replace(/(\d+)\s+(\d+)/g, '$1 # $2');
-    }
-
-    function getAddressVariants(address){
-      const normalized = normalizeColombianAddress(address);
-      return [address, normalized]
-        .filter(Boolean)
-        .filter((item, index, list) => index === list.indexOf(item));
-    }
-
-    function getAddressSearchQueries(){
-      const { address, zone, city } = getAddressParts();
-      const baseQueries = [];
-
-      getAddressVariants(address).forEach(addressVariant => {
-        baseQueries.push([addressVariant, zone, city].filter(Boolean).join(', '));
-        baseQueries.push([addressVariant, city].filter(Boolean).join(', '));
-        baseQueries.push([addressVariant, zone].filter(Boolean).join(', '));
-        baseQueries.push(`${addressVariant}, ${city}, Santander`);
-      });
-
-      if(zone && city) baseQueries.push([zone, city, 'Santander'].join(', '));
-      if(city) baseQueries.push([city, 'Santander'].join(', '));
-
-      const cleanQueries = baseQueries.filter(query => query.length >= 3);
-
-      const expandedQueries = [];
-      cleanQueries.forEach(query => {
-        expandedQueries.push(query);
-        if(!/colombia/i.test(query)) expandedQueries.push(`${query}, Colombia`);
-      });
-
-      return expandedQueries.filter((query, index, list) => index === list.indexOf(query)).slice(0, 12);
-    }
-
-    function clearDeliveryLocation(message){
-      deliveryLocation = null;
-      if(mapLink) mapLink.href = 'https://www.openstreetmap.org/';
-      if(checkoutMarker){
-        checkoutMarker.remove();
-        checkoutMarker = null;
-      }
-      if(checkoutMap) checkoutMap.setView(DEFAULT_MAP_CENTER, DEFAULT_MAP_ZOOM);
-      setMapStatus(message);
-    }
-
-    function initCheckoutMap(){
-      if(checkoutMap || !document.getElementById('checkoutMap')) return;
-
-      if(!window.L){
-        setMapStatus('No se pudo cargar el mapa. Revisa tu conexión a internet.');
-        return;
+      if(deliveryDate.value && deliveryDate.value < todayValue){
+        deliveryDate.value = todayValue;
+        showToast('La fecha debe ser hoy o una fecha posterior');
+        deliveryDate.focus();
+        return false;
       }
 
-      checkoutMap = L.map('checkoutMap', {
-        zoomControl:false,
-        scrollWheelZoom:false
-      }).setView(DEFAULT_MAP_CENTER, DEFAULT_MAP_ZOOM);
-
-      L.control.zoom({ position:'bottomright' }).addTo(checkoutMap);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom:19,
-        attribution:'&copy; OpenStreetMap'
-      }).addTo(checkoutMap);
-    }
-
-    function updateMapLocation(location){
-      if(!checkoutMap) return;
-
-      deliveryLocation = location;
-      const latLng = [location.lat, location.lon];
-      checkoutMap.setView(latLng, location.zoom || 16);
-
-      if(!checkoutMarker){
-        checkoutMarker = L.marker(latLng).addTo(checkoutMap);
-      }else{
-        checkoutMarker.setLatLng(latLng);
-      }
-
-      checkoutMarker.bindPopup(location.label).openPopup();
-      if(mapLink) mapLink.href = location.url;
-      setMapStatus(`Ubicación seleccionada: ${location.label}`);
-    }
-
-    function normalizeNominatimLocation(result){
-      const lat = Number(result.lat);
-      const lon = Number(result.lon);
-      const address = result.address || {};
-      const road = [address.road || address.pedestrian || address.footway || address.neighbourhood || result.name, address.house_number].filter(Boolean).join(' ');
-      const city = address.city || address.town || address.village || address.municipality || '';
-      const zone = address.suburb || address.neighbourhood || address.city_district || address.quarter || '';
-      return {
-        lat,
-        lon,
-        zoom:17,
-        label:result.display_name,
-        mainText:road || result.display_name.split(',')[0],
-        city,
-        zone,
-        type:result.type || result.class || 'Ubicación',
-        url:`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=17/${lat}/${lon}`
-      };
-    }
-
-    async function searchNominatim(query, limit = 5){
-      const url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=${limit}&q=${encodeURIComponent(query)}`;
-      const response = await fetch(url, { headers:{ 'Accept':'application/json' } });
-      if(!response.ok) throw new Error('No se pudo consultar OpenStreetMap.');
-      const results = await response.json();
-      return results.map(normalizeNominatimLocation);
-    }
-
-    async function searchStructuredNominatim(limit = 5){
-      const { address, city } = getAddressParts();
-      const params = new URLSearchParams({
-        format:'json',
-        addressdetails:'1',
-        limit:String(limit),
-        street:normalizeColombianAddress(address),
-        city,
-        state:'Santander',
-        country:'Colombia'
-      });
-      const response = await fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`, {
-        headers:{ 'Accept':'application/json' }
-      });
-      if(!response.ok) throw new Error('No se pudo consultar OpenStreetMap.');
-      const results = await response.json();
-      return results.map(normalizeNominatimLocation);
-    }
-
-    async function searchAddressLocation(queries, limit = 5){
-      const locations = [];
-
-      try{
-        locations.push(...await searchStructuredNominatim(limit));
-      }catch(error){}
-
-      for(const query of queries){
-        try{
-          locations.push(...await searchNominatim(query, limit));
-        }catch(error){}
-
-        if(locations.length >= limit) break;
-      }
-
-      return locations
-        .filter(location => Number.isFinite(location.lat) && Number.isFinite(location.lon))
-        .filter((location, index, list) => index === list.findIndex(item => item.label === location.label))
-        .slice(0, limit)[0] || null;
-    }
-
-    async function verifyAddress(){
-      const queries = getAddressSearchQueries();
-      const { address, city } = getAddressParts();
-
-      if(!address || !city){
-        clearDeliveryLocation('Completa al menos dirección y ciudad antes de verificar.');
-        return;
-      }
-
-      if(!window.L) return;
-      initCheckoutMap();
-      const requestId = ++geocodeRequestId;
-      clearDeliveryLocation('Verificando dirección en OpenStreetMap...');
-      if(verifyAddressBtn) verifyAddressBtn.disabled = true;
-
-      try{
-        const location = await searchAddressLocation(queries, 5);
-        if(requestId !== geocodeRequestId) return;
-
-        if(!location){
-          clearDeliveryLocation('No pudimos verificar la dirección. Prueba con una dirección más simple o agrega barrio/zona.');
-          return;
-        }
-
-        updateMapLocation(location);
-      }catch(error){
-        clearDeliveryLocation('No se pudo consultar OpenStreetMap en este momento.');
-      }finally{
-        if(verifyAddressBtn) verifyAddressBtn.disabled = false;
-      }
+      return true;
     }
 
     function addToCart(id, qty = 1){
@@ -386,8 +520,13 @@
     }
 
     function setCartQty(id, qty){
-      if(qty <= 0) delete state.cart[id];
-      else state.cart[id] = qty;
+      if(qty <= 0){
+        delete state.cart[id];
+        customProducts = customProducts.filter(product => product.id !== id);
+        persistCustomProducts();
+      }else{
+        state.cart[id] = qty;
+      }
       persistCart();
       renderCart();
       updateCartBadges();
@@ -395,6 +534,8 @@
 
     function clearCart(){
       state.cart = {};
+      customProducts = [];
+      persistCustomProducts();
       persistCart();
       renderCart();
       updateCartBadges();
@@ -403,8 +544,10 @@
     function openCart(){
       openOverlay();
       modal.classList.remove('is-open');
+      cheesecakeModal.classList.remove('is-open');
       checkoutPanel.classList.remove('is-open');
       modal.setAttribute('aria-hidden','true');
+      cheesecakeModal.setAttribute('aria-hidden','true');
       checkoutPanel.setAttribute('aria-hidden','true');
       cartDrawer.classList.add('is-open');
       cartDrawer.setAttribute('aria-hidden','false');
@@ -419,15 +562,13 @@
       openOverlay();
       modal.classList.remove('is-open');
       cartDrawer.classList.remove('is-open');
+      cheesecakeModal.classList.remove('is-open');
       modal.setAttribute('aria-hidden','true');
       cartDrawer.setAttribute('aria-hidden','true');
+      cheesecakeModal.setAttribute('aria-hidden','true');
       checkoutPanel.classList.add('is-open');
       checkoutPanel.setAttribute('aria-hidden','false');
       renderCheckoutSummary();
-      initCheckoutMap();
-      setTimeout(() => {
-        if(checkoutMap) checkoutMap.invalidateSize();
-      }, 260);
     }
 
     function renderCart(){
@@ -442,10 +583,10 @@
 
       cartList.innerHTML = entries.map(({product, qty}) => `
         <article class="cart-item">
-          <div class="cart-thumb">${pastrySvg(product.visual)}</div>
+          <div class="cart-thumb">${productVisual(product)}</div>
           <div>
             <h3>${product.name}</h3>
-            <p>${formatPrice(product.price)} · ${product.tag}</p>
+            <p>${productPriceLabel(product)} · ${product.tag}</p>
             <div class="cart-row">
               <div class="qty-control">
                 <button type="button" data-cart-minus="${product.id}" aria-label="Restar ${product.name}">−</button>
@@ -453,7 +594,8 @@
                 <button type="button" data-cart-plus="${product.id}" aria-label="Sumar ${product.name}">+</button>
               </div>
               <div style="display:grid;gap:.22rem;text-align:right">
-                <strong class="price">${formatPrice(product.price * qty)}</strong>
+                <strong class="price">${productLineTotal(product, qty)}</strong>
+                ${product.isCustom ? `<button class="remove-btn" type="button" data-cart-edit="${product.id}">Editar</button>` : ''}
                 <button class="remove-btn" type="button" data-cart-remove="${product.id}">Eliminar</button>
               </div>
             </div>
@@ -465,7 +607,7 @@
     function renderCheckoutSummary(){
       const entries = cartEntries();
       document.getElementById('checkoutSummary').innerHTML = entries.map(({product, qty}) => `
-        <div class="summary-item"><span><b>${qty}×</b> ${product.name}</span><strong>${formatPrice(product.price * qty)}</strong></div>
+        <div class="summary-item"><span><b>${qty}×</b> ${product.name}</span><strong>${productLineTotal(product, qty)}</strong></div>
       `).join('');
       document.getElementById('checkoutTotal').textContent = formatPrice(cartTotal());
     }
@@ -488,18 +630,32 @@
     function buildWhatsappMessage(form){
       const orderId = `RV-${Date.now().toString().slice(-6)}`;
       const entries = cartEntries();
-      const productLines = entries.map(({product, qty}) => `• ${qty} x ${product.name} — ${formatPrice(product.price * qty)}`).join('\n');
+      const productLines = entries.map(({product, qty}) => {
+        const details = product.isCustom && product.details?.length ? `\n  ${product.details.join('\n  ')}` : '';
+        return `• ${qty} x ${product.name} — ${productLineTotal(product, qty)}${details}`;
+      }).join('\n');
       const formData = new FormData(form);
       const dataLines = [...formData.entries()]
         .filter(([, value]) => String(value).trim().length)
         .map(([key, value]) => `• ${key}: ${value}`)
         .join('\n');
-      const mapLine = deliveryLocation ? `\n• Mapa: ${deliveryLocation.url}` : '';
-
-      return `Hola Rivela, quiero hacer este pedido.\n\nPedido: ${orderId}\n\nProductos:\n${productLines}\n\nTotal estimado: ${formatPrice(cartTotal())}\n\nDatos del cliente y entrega:\n${dataLines}${mapLine}\n\nQuedo pendiente de confirmación de disponibilidad, domicilio y pago. Gracias.`;
+      return `Hola Rivela, quiero hacer este pedido.\n\nPedido: ${orderId}\n\nProductos:\n${productLines}\n\nTotal estimado: ${formatPrice(cartTotal())}\n\nDatos del cliente y entrega:\n${dataLines}\n\nQuedo pendiente de confirmación de disponibilidad, domicilio y pago. Gracias.`;
     }
 
     document.addEventListener('click', event => {
+      const menuButton = event.target.closest('[data-menu-toggle]');
+      if(menuButton){
+        event.preventDefault();
+        toggleMobileMenu();
+        return;
+      }
+
+      const mobileMenuLink = event.target.closest('.mobile-menu a');
+      if(mobileMenuLink){
+        closeMobileMenu();
+        return;
+      }
+
       const productButton = event.target.closest('[data-product-id]');
       if(productButton){
         event.preventDefault();
@@ -518,6 +674,13 @@
       if(checkoutButton){
         event.preventDefault();
         openCheckout();
+        return;
+      }
+
+      const cheesecakeButton = event.target.closest('[data-open-cheesecake]');
+      if(cheesecakeButton){
+        event.preventDefault();
+        openCheesecakeModal();
       }
     });
 
@@ -545,23 +708,48 @@
       if(state.activeProduct){
         addToCart(state.activeProduct.id, state.detailQty);
         closeAll();
-        openCart();
       }
     });
     document.getElementById('buyNowBtn').addEventListener('click', () => {
       if(state.activeProduct){
         addToCart(state.activeProduct.id, state.detailQty);
-        openCheckout();
+        openCart();
       }
     });
+
+    ['cheesecakeBase', 'cheesecakeFlavor'].forEach(id => {
+      document.getElementById(id).addEventListener('change', updateCheesecakePreview);
+    });
+    document.getElementById('cheesecakeToppings').addEventListener('click', event => {
+      const plus = event.target.closest('[data-topping-plus]');
+      const minus = event.target.closest('[data-topping-minus]');
+      const name = plus?.dataset.toppingPlus || minus?.dataset.toppingMinus;
+      if(!name) return;
+
+      const current = Number(getToppingQtyElement(name)?.textContent || 0);
+      setToppingQty(name, plus ? current + 1 : Math.max(0, current - 1));
+      updateCheesecakePreview();
+    });
+    document.getElementById('cheesecakeMinus').addEventListener('click', () => {
+      state.cheesecakeQty = Math.max(1, state.cheesecakeQty - 1);
+      document.getElementById('cheesecakeQty').textContent = state.cheesecakeQty;
+    });
+    document.getElementById('cheesecakePlus').addEventListener('click', () => {
+      state.cheesecakeQty += 1;
+      document.getElementById('cheesecakeQty').textContent = state.cheesecakeQty;
+    });
+    document.getElementById('addCustomCheesecakeBtn').addEventListener('click', () => addCustomCheesecake(false));
+    document.getElementById('orderCustomCheesecakeBtn').addEventListener('click', () => addCustomCheesecake(true));
 
     document.getElementById('cartList').addEventListener('click', event => {
       const plus = event.target.closest('[data-cart-plus]');
       const minus = event.target.closest('[data-cart-minus]');
       const remove = event.target.closest('[data-cart-remove]');
+      const edit = event.target.closest('[data-cart-edit]');
       if(plus) setCartQty(plus.dataset.cartPlus, (state.cart[plus.dataset.cartPlus] || 0) + 1);
       if(minus) setCartQty(minus.dataset.cartMinus, (state.cart[minus.dataset.cartMinus] || 0) - 1);
       if(remove) setCartQty(remove.dataset.cartRemove, 0);
+      if(edit) openCheesecakeModal(edit.dataset.cartEdit);
     });
 
     document.getElementById('clearCartBtn').addEventListener('click', clearCart);
@@ -569,20 +757,13 @@
 
     document.getElementById('orderForm').addEventListener('input', saveCustomerData);
     document.getElementById('orderForm').addEventListener('change', saveCustomerData);
-    ['address', 'city', 'zone'].forEach(id => {
-      document.getElementById(id).addEventListener('input', () => {
-        deliveryLocation = null;
-        if(mapLink) mapLink.href = 'https://www.openstreetmap.org/';
-        setMapStatus('Dirección editada. Presiona "Verificar dirección" para actualizar el mapa.');
-      });
-    });
-    if(verifyAddressBtn) verifyAddressBtn.addEventListener('click', verifyAddress);
     document.getElementById('orderForm').addEventListener('submit', event => {
       event.preventDefault();
       if(cartUnits() === 0){
         showToast('El carrito está vacío');
         return;
       }
+      if(!validateDeliveryDate()) return;
       saveCustomerData();
       const message = buildWhatsappMessage(event.currentTarget);
       const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
@@ -596,8 +777,13 @@
     });
 
     async function init(){
-      loadCustomerData();
       await loadProducts();
+      renderPromoBanner();
+      renderCheckoutOptions();
+      renderCheesecakeOptions();
+      setMinimumDeliveryDate();
+      loadCustomerData();
+      setMinimumDeliveryDate();
       if(products.length){
         renderProducts();
         renderCart();

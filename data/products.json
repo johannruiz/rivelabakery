@@ -1,92 +1,202 @@
-[
-  {
-    "id": "tarta-frutos-rojos",
-    "category": "tartas",
-    "tag": "Tarta de autor",
-    "name": "Tarta Rivela de frutos rojos",
-    "price": 28,
-    "short": "Bizcocho suave, crema de vainilla y frutos rojos frescos.",
-    "description": "Una tarta protagonista para celebrar sin exceso: capas suaves, acidez delicada y acabado limpio con estética artesanal.",
-    "details": [
-      "Rinde de 6 a 8 porciones",
-      "Preparación bajo pedido",
-      "Disponible con empaque regalo"
+{
+  "settings": {
+    "promoBanner": [
+      {
+        "text": "Promo de temporada · "
+      },
+      {
+        "text": "15% OFF",
+        "highlight": true
+      },
+      {
+        "text": " en cajas regalo y tartas seleccionadas · Pedidos por WhatsApp"
+      }
     ],
-    "visual": "cake"
+    "deliveryTypes": [
+      "Domicilio",
+      "Recogida en punto acordado"
+    ],
+    "paymentMethods": [
+      "Transferencia Bancolombia",
+      "Nequi",
+      "LLave BreB",
+      "Efectivo"
+    ],
+    "timeSlots": [
+      "9:00 a. m.",
+      "9:30 a. m.",
+      "10:00 a. m.",
+      "10:30 a. m.",
+      "11:00 a. m.",
+      "11:30 a. m.",
+      "12:00 p. m.",
+      "12:30 p. m.",
+      "1:00 p. m.",
+      "1:30 p. m.",
+      "2:00 p. m.",
+      "2:30 p. m.",
+      "3:00 p. m.",
+      "3:30 p. m.",
+      "4:00 p. m.",
+      "4:30 p. m.",
+      "5:00 p. m.",
+      "5:30 p. m.",
+      "6:00 p. m."
+    ],
+    "cheesecakeBuilder": {
+      "name": "Cheesecake personalizado",
+      "tag": "Crea tu cheesecake",
+      "defaultVisual": "cheesecake",
+      "bases": [
+        {
+          "name": "Clasico",
+          "price": 45000
+        }
+      ],
+      "flavors": [
+        {
+          "name": "Frutos rojos",
+          "price": 8000
+        },
+        {
+          "name": "Ferrero",
+          "price": 12000
+        },
+        {
+          "name": "Cookies & Cream",
+          "price": 10000
+        }
+      ],
+      "toppings": [
+        {
+          "name": "Mix frutos rojos",
+          "price": 6000
+        },
+        {
+          "name": "Oreo triturado",
+          "price": 4000
+        },
+        {
+          "name": "Mani",
+          "price": 3000
+        },
+        {
+          "name": "Ferrero",
+          "price": 8000
+        }
+      ],
+      "combinationImages": [
+        {
+          "base": "Clasico",
+          "flavor": "Frutos rojos",
+          "topping": "Mix frutos rojos",
+          "visual": "cheesecake-frutos-rojos.webp"
+        },
+        {
+          "base": "Clasico",
+          "flavor": "Ferrero",
+          "topping": "Ferrero",
+          "visual": "cheesecake-ferrero.webp"
+        },
+        {
+          "base": "Clasico",
+          "flavor": "Cookies & Cream",
+          "topping": "Oreo triturado",
+          "visual": "cheesecake-cookies-cream.webp"
+        }
+      ]
+    }
   },
-  {
-    "id": "brownie-cacao-nuez",
-    "category": "individuales",
-    "tag": "Individual",
-    "name": "Brownie de cacao & nuez",
-    "price": 3.8,
-    "short": "Denso, brillante y con nuez tostada.",
-    "description": "El brownie que funciona como producto de entrada: intenso, húmedo y fácil de sumar al carrito en varias unidades.",
-    "details": [
-      "Unidad individual",
-      "Ideal para café o regalo pequeño",
-      "Contiene frutos secos"
-    ],
-    "visual": "brownie"
-  },
-  {
-    "id": "cheesecake-vainilla",
-    "category": "individuales",
-    "tag": "Individual premium",
-    "name": "Cheesecake de vainilla",
-    "price": 5.5,
-    "short": "Base crocante y crema ligera con vainilla.",
-    "description": "Formato individual con acabado premium: textura cremosa, notas de vainilla y una presentación sobria para vitrina o delivery.",
-    "details": [
-      "Porción individual",
-      "Requiere refrigeración",
-      "Puede llevar topping de frutos rojos"
-    ],
-    "visual": "cheesecake"
-  },
-  {
-    "id": "gugelhupf-almendra",
-    "category": "tartas",
-    "tag": "Clásico europeo",
-    "name": "Gugelhupf de almendra",
-    "price": 18,
-    "short": "Miga aromática, almendra y azúcar suave.",
-    "description": "Un clásico de cafetería europea reinterpretado para Rivela: casero, elegante y perfecto para compartir.",
-    "details": [
-      "Rinde de 5 a 6 porciones",
-      "Acabado con azúcar glas",
-      "Disponible por encargo"
-    ],
-    "visual": "gugelhupf"
-  },
-  {
-    "id": "caja-rivela",
-    "category": "cajas",
-    "tag": "Caja regalo",
-    "name": "Caja selección Rivela",
-    "price": 24,
-    "short": "Mini dulces surtidos en empaque especial.",
-    "description": "Caja pensada para regalo o detalle corporativo: una selección equilibrada de mini piezas con empaque cuidado.",
-    "details": [
-      "Incluye 8 mini piezas",
-      "Permite dedicatoria corta",
-      "Empaque premium incluido"
-    ],
-    "visual": "box"
-  },
-  {
-    "id": "croissant-crema",
-    "category": "individuales",
-    "tag": "Mañana dulce",
-    "name": "Croissant de crema ligera",
-    "price": 4.2,
-    "short": "Hojaldre delicado con relleno de crema.",
-    "description": "Un producto cotidiano elevado por el acabado visual: hojaldre, crema suave y una capa final de azúcar sutil.",
-    "details": [
-      "Unidad individual",
-      "Mejor consumir el mismo día",
-      "Disponible hasta agotar producción"
-    ],
-    "visual": "croissant"
-  }
-]
+  "products": [
+    {
+      "id": "tarta-frutos-rojos",
+      "category": "tartas",
+      "tag": "Tarta de autor",
+      "name": "Tarta Rivela de frutos rojos",
+      "price": 129000,
+      "short": "Bizcocho suave, crema de vainilla y frutos rojos frescos.",
+      "description": "Una tarta protagonista para celebrar sin exceso: capas suaves, acidez delicada y acabado limpio con estetica artesanal.",
+      "details": [
+        "Rinde de 6 a 8 porciones",
+        "Preparacion bajo pedido",
+        "Disponible con empaque regalo"
+      ],
+      "visual": "cake"
+    },
+    {
+      "id": "brownie-cacao-nuez",
+      "category": "individuales",
+      "tag": "Individual",
+      "name": "Brownie de cacao & nuez",
+      "price": 12900,
+      "short": "Denso, brillante y con nuez tostada.",
+      "description": "El brownie que funciona como producto de entrada: intenso, humedo y facil de sumar al carrito en varias unidades.",
+      "details": [
+        "Unidad individual",
+        "Ideal para cafe o regalo pequeno",
+        "Contiene frutos secos"
+      ],
+      "visual": "brownie"
+    },
+    {
+      "id": "cheesecake-vainilla",
+      "category": "individuales",
+      "tag": "Individual premium",
+      "name": "Cheesecake de vainilla",
+      "price": 18900,
+      "short": "Base crocante y crema ligera con vainilla.",
+      "description": "Formato individual con acabado premium: textura cremosa, notas de vainilla y una presentacion sobria para vitrina o delivery.",
+      "details": [
+        "Porcion individual",
+        "Requiere refrigeracion",
+        "Puede llevar topping de frutos rojos"
+      ],
+      "visual": "cheesecake"
+    },
+    {
+      "id": "gugelhupf-almendra",
+      "category": "tartas",
+      "tag": "Clasico europeo",
+      "name": "Gugelhupf de almendra",
+      "price": 74000,
+      "short": "Miga aromatica, almendra y azucar suave.",
+      "description": "Un clasico de cafeteria europea reinterpretado para Rivela: casero, elegante y perfecto para compartir.",
+      "details": [
+        "Rinde de 5 a 6 porciones",
+        "Acabado con azucar glas",
+        "Disponible por encargo"
+      ],
+      "visual": "gugelhupf"
+    },
+    {
+      "id": "caja-rivela",
+      "category": "cajas",
+      "tag": "Caja regalo",
+      "name": "Caja seleccion Rivela",
+      "price": 89900,
+      "short": "Mini dulces surtidos en empaque especial.",
+      "description": "Caja pensada para regalo o detalle corporativo: una seleccion equilibrada de mini piezas con empaque cuidado.",
+      "details": [
+        "Incluye 8 mini piezas",
+        "Permite dedicatoria corta",
+        "Empaque premium incluido"
+      ],
+      "visual": "box"
+    },
+    {
+      "id": "croissant-crema",
+      "category": "individuales",
+      "tag": "Manana dulce",
+      "name": "Croissant de crema ligera",
+      "price": 15900,
+      "short": "Hojaldre delicado con relleno de crema.",
+      "description": "Un producto cotidiano elevado por el acabado visual: hojaldre, crema suave y una capa final de azucar sutil.",
+      "details": [
+        "Unidad individual",
+        "Mejor consumir el mismo dia",
+        "Disponible hasta agotar produccion"
+      ],
+      "visual": "croissant"
+    }
+  ]
+}
