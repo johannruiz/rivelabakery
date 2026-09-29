@@ -4,6 +4,16 @@
     const PRODUCTS_URL = 'data/products.json';
     const CUSTOMER_STORAGE_KEY = 'rivelaCustomerData';
     const CUSTOM_PRODUCTS_STORAGE_KEY = 'rivelaCustomProducts';
+
+    function safeParseStorage(storage, key, fallback){
+      try{
+        const raw = storage.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+      }catch(error){
+        storage.removeItem(key);
+        return fallback;
+      }
+    }
     const CUSTOMER_FIELD_IDS = [
       'customerName',
       'customerPhone',
@@ -34,11 +44,11 @@
         combinationImages:[]
       }
     };
-    let customProducts = JSON.parse(localStorage.getItem(CUSTOM_PRODUCTS_STORAGE_KEY) || '[]');
+    let customProducts = safeParseStorage(localStorage, CUSTOM_PRODUCTS_STORAGE_KEY, []);
 
     const state = {
       filter:'all',
-      cart: JSON.parse(localStorage.getItem('rivelaCart') || '{}'),
+      cart: safeParseStorage(localStorage, 'rivelaCart', {}),
       activeProduct:null,
       detailQty:1,
       cheesecakeQty:1,
@@ -55,6 +65,7 @@
     const topPromo = document.querySelector('.top-promo');
     const siteHeader = document.querySelector('.site-header');
     const menuToggle = document.querySelector('[data-menu-toggle]');
+    let lastFocusedElement = null;
 
     const formatPrice = value => `$${Number(value || 0).toLocaleString('es-CO', { maximumFractionDigits:0 })}`;
     const getProduct = id => [...products, ...customProducts].find(product => product.id === id);
@@ -136,6 +147,18 @@
       fillSelect('deliveryType', storeSettings.deliveryTypes, 'Selecciona entrega');
       fillSelect('payment', storeSettings.paymentMethods, 'Selecciona pago');
       fillSelect('hour', storeSettings.timeSlots, 'Selecciona horario');
+    }
+
+    function updateDeliveryFields(){
+      const deliveryType = document.getElementById('deliveryType');
+      const isPickup = /recogida|pickup/i.test(deliveryType?.value || '');
+      document.querySelectorAll('[data-delivery-address]').forEach(field => {
+        field.classList.toggle('is-hidden', isPickup);
+        field.querySelectorAll('input,select,textarea').forEach(input => {
+          if(input.id === 'address' || input.id === 'city') input.required = !isPickup;
+          input.disabled = isPickup;
+        });
+      });
     }
 
     function renderCheesecakeOptions(){
@@ -220,24 +243,6 @@
       }catch(error){
         deliveryDate.focus();
       }
-    }
-
-    function handleDatePointer(event){
-      if(event.pointerType !== 'mouse') return;
-      event.preventDefault();
-      openDatePicker();
-    }
-
-    function blockDateTyping(event){
-      const allowedKeys = ['Tab', 'Escape', 'Enter', ' ', 'ArrowDown'];
-      if(allowedKeys.includes(event.key)){
-        if(event.key !== 'Tab' && event.key !== 'Escape'){
-          event.preventDefault();
-          openDatePicker();
-        }
-        return;
-      }
-      event.preventDefault();
     }
 
     function setMinimumDeliveryDate(){
@@ -398,20 +403,36 @@
       const visible = products.filter(product => state.filter === 'all' || product.category === state.filter);
       productGrid.innerHTML = visible.map(product => `
         <article class="product-card">
-          <button class="product-button" type="button" data-product-id="${product.id}" aria-label="Ver detalle de ${product.name}">
+          <button class="product-button" type="button" data-product-id="${escapeHtml(product.id)}" aria-label="Ver detalle de ${escapeHtml(product.name)}">
             <div class="product-media">${productVisual(product)}</div>
             <div class="product-info">
-              <span class="tag">${product.tag}</span>
+              <span class="tag">${escapeHtml(product.tag)}</span>
               <div class="product-title-row">
-                <h3>${product.name}</h3>
-                <span class="price">${productPriceLabel(product)}</span>
+                <h3>${escapeHtml(product.name)}</h3>
+                <span class="price">${escapeHtml(productPriceLabel(product))}</span>
               </div>
-              <p>${product.short}</p>
+              <p>${escapeHtml(product.short)}</p>
               <div class="product-meta"><span>Bajo pedido</span><span>Empaque Rivela</span></div>
             </div>
           </button>
         </article>
       `).join('');
+    }
+
+    function rememberFocus(){
+      lastFocusedElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    }
+
+    function focusDialog(container){
+      requestAnimationFrame(() => {
+        const target = container.querySelector('[data-close-all], button, input, select, textarea, a[href]');
+        target?.focus();
+      });
+    }
+
+    function restoreFocus(){
+      if(lastFocusedElement && document.contains(lastFocusedElement)) lastFocusedElement.focus();
+      lastFocusedElement = null;
     }
 
     function openOverlay(){
@@ -442,11 +463,13 @@
       checkoutPanel.setAttribute('aria-hidden','true');
       document.body.classList.remove('no-scroll');
       state.editingCustomId = null;
+      restoreFocus();
     }
 
     function openProduct(id){
       const product = getProduct(id);
       if(!product) return;
+      rememberFocus();
       cartDrawer.classList.remove('is-open');
       checkoutPanel.classList.remove('is-open');
       cheesecakeModal.classList.remove('is-open');
@@ -460,11 +483,12 @@
       document.getElementById('modalTitle').textContent = product.name;
       document.getElementById('modalPrice').textContent = productPriceLabel(product);
       document.getElementById('modalDescription').textContent = product.description;
-      document.getElementById('modalDetails').innerHTML = product.details.map(detail => `<li>${detail}</li>`).join('');
+      document.getElementById('modalDetails').innerHTML = (product.details || []).map(detail => `<li>${escapeHtml(detail)}</li>`).join('');
       document.getElementById('detailQty').textContent = state.detailQty;
       openOverlay();
       modal.classList.add('is-open');
       modal.setAttribute('aria-hidden','false');
+      focusDialog(modal);
     }
 
     function persistCart(){
@@ -502,6 +526,7 @@
 
       document.getElementById('addCustomCheesecakeBtn').textContent = state.editingCustomId ? 'Guardar cambios' : 'Agregar al carrito';
       document.getElementById('orderCustomCheesecakeBtn').textContent = state.editingCustomId ? 'Guardar y ver carrito' : 'Pedir ahora';
+      rememberFocus();
       openOverlay();
       modal.classList.remove('is-open');
       cartDrawer.classList.remove('is-open');
@@ -511,6 +536,7 @@
       checkoutPanel.setAttribute('aria-hidden','true');
       cheesecakeModal.classList.add('is-open');
       cheesecakeModal.setAttribute('aria-hidden','false');
+      focusDialog(cheesecakeModal);
     }
 
     function getCustomerFields(){
@@ -521,12 +547,12 @@
 
     function loadCustomerData(){
       try{
-        const savedData = JSON.parse(localStorage.getItem(CUSTOMER_STORAGE_KEY) || '{}');
+        const savedData = safeParseStorage(sessionStorage, CUSTOMER_STORAGE_KEY, {});
         getCustomerFields().forEach(field => {
           if(savedData[field.id] !== undefined) field.value = savedData[field.id];
         });
       }catch(error){
-        localStorage.removeItem(CUSTOMER_STORAGE_KEY);
+        sessionStorage.removeItem(CUSTOMER_STORAGE_KEY);
       }
     }
 
@@ -535,7 +561,7 @@
       getCustomerFields().forEach(field => {
         customerData[field.id] = field.value;
       });
-      localStorage.setItem(CUSTOMER_STORAGE_KEY, JSON.stringify(customerData));
+      sessionStorage.setItem(CUSTOMER_STORAGE_KEY, JSON.stringify(customerData));
     }
 
     function validateDeliveryDate(){
@@ -586,6 +612,7 @@
     }
 
     function openCart(){
+      rememberFocus();
       openOverlay();
       modal.classList.remove('is-open');
       cheesecakeModal.classList.remove('is-open');
@@ -596,6 +623,7 @@
       cartDrawer.classList.add('is-open');
       cartDrawer.setAttribute('aria-hidden','false');
       renderCart();
+      focusDialog(cartDrawer);
     }
 
     function openCheckout(){
@@ -613,6 +641,7 @@
       checkoutPanel.classList.add('is-open');
       checkoutPanel.setAttribute('aria-hidden','false');
       renderCheckoutSummary();
+      focusDialog(checkoutPanel);
     }
 
     function renderCart(){
@@ -629,18 +658,18 @@
         <article class="cart-item">
           <div class="cart-thumb">${productVisual(product)}</div>
           <div>
-            <h3>${product.name}</h3>
-            <p>${productPriceLabel(product)} · ${product.tag}</p>
+            <h3>${escapeHtml(product.name)}</h3>
+            <p>${escapeHtml(productPriceLabel(product))} · ${escapeHtml(product.tag)}</p>
             <div class="cart-row">
               <div class="qty-control">
-                <button type="button" data-cart-minus="${product.id}" aria-label="Restar ${product.name}">−</button>
+                <button type="button" data-cart-minus="${escapeHtml(product.id)}" aria-label="Restar ${escapeHtml(product.name)}">−</button>
                 <span class="qty-value">${qty}</span>
-                <button type="button" data-cart-plus="${product.id}" aria-label="Sumar ${product.name}">+</button>
+                <button type="button" data-cart-plus="${escapeHtml(product.id)}" aria-label="Sumar ${escapeHtml(product.name)}">+</button>
               </div>
               <div style="display:grid;gap:.22rem;text-align:right">
                 <strong class="price">${productLineTotal(product, qty)}</strong>
-                ${product.isCustom ? `<button class="remove-btn" type="button" data-cart-edit="${product.id}">Editar</button>` : ''}
-                <button class="remove-btn" type="button" data-cart-remove="${product.id}">Eliminar</button>
+                ${product.isCustom ? `<button class="remove-btn" type="button" data-cart-edit="${escapeHtml(product.id)}">Editar</button>` : ''}
+                <button class="remove-btn" type="button" data-cart-remove="${escapeHtml(product.id)}">Eliminar</button>
               </div>
             </div>
           </div>
@@ -651,7 +680,7 @@
     function renderCheckoutSummary(){
       const entries = cartEntries();
       document.getElementById('checkoutSummary').innerHTML = entries.map(({product, qty}) => `
-        <div class="summary-item"><span><b>${qty}×</b> ${product.name}</span><strong>${productLineTotal(product, qty)}</strong></div>
+        <div class="summary-item"><span><b>${qty}×</b> ${escapeHtml(product.name)}</span><strong>${escapeHtml(productLineTotal(product, qty))}</strong></div>
       `).join('');
       document.getElementById('checkoutTotal').textContent = formatPrice(cartTotal());
     }
@@ -798,11 +827,7 @@
 
     document.getElementById('clearCartBtn').addEventListener('click', clearCart);
     document.getElementById('checkoutBtn').addEventListener('click', openCheckout);
-    document.getElementById('deliveryDate').addEventListener('pointerdown', handleDatePointer);
-    document.getElementById('deliveryDate').addEventListener('click', openDatePicker);
-    document.getElementById('deliveryDate').addEventListener('keydown', blockDateTyping);
-    document.getElementById('deliveryDate').addEventListener('beforeinput', event => event.preventDefault());
-    document.getElementById('deliveryDate').addEventListener('paste', event => event.preventDefault());
+    document.getElementById('deliveryType').addEventListener('change', updateDeliveryFields);
 
     document.getElementById('orderForm').addEventListener('input', () => {
       saveCustomerData();
@@ -828,17 +853,38 @@
     document.addEventListener('keydown', event => {
       if(event.key === 'Escape'){
         closeAll();
+        return;
+      }
+
+      if(event.key !== 'Tab') return;
+      const activeDialog = [modal, cheesecakeModal, cartDrawer, checkoutPanel]
+        .find(item => item.classList.contains('is-open'));
+      if(!activeDialog) return;
+
+      const focusables = [...activeDialog.querySelectorAll(
+        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      )].filter(item => !item.hidden && item.offsetParent !== null);
+
+      if(!focusables.length) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+
+      if(event.shiftKey && document.activeElement === first){
+        event.preventDefault();
+        last.focus();
+      }else if(!event.shiftKey && document.activeElement === last){
+        event.preventDefault();
+        first.focus();
       }
     });
 
     async function init(){
       await loadProducts();
-      renderPromoBanner();
       renderCheckoutOptions();
       renderCheesecakeOptions();
       setMinimumDeliveryDate();
       loadCustomerData();
-      setMinimumDeliveryDate();
+      updateDeliveryFields();
       if(products.length){
         renderProducts();
         renderCart();

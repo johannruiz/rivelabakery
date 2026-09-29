@@ -4,12 +4,16 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Rivela Bakery</title>
-  <meta name="description" content="Rivela Bakery: pastelería artesanal premium con pedidos por encargo, cajas regalo y dulces para celebrar con calma." />
+  <meta name="description" content="Rivela Bakery. Elige tus favoritos, agrégalos al carrito y genera tu pedido de forma simple." />
+  <meta name="theme-color" content="#53231A" />
+  <meta property="og:title" content="Rivela Bakery" />
+  <meta property="og:description" content="Del horno de mamá, al empaque perfecto. Conoce el menú y arma tu pedido." />
+  <meta property="og:type" content="website" />
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
-  <div class="top-promo">Promo de temporada · <strong>15% OFF</strong> en cajas regalo y tartas seleccionadas · Pedidos por WhatsApp</div>
+  <div class="top-promo"><span>Delivery en Bucaramanga</span><i aria-hidden="true">•</i><span>Elige, agrega al carrito y haz tu pedido</span></div>
 
   <header class="site-header">
     <div class="header-inner">
@@ -17,9 +21,8 @@
         <img class="brand-logo" src="assets/rivelalogo.svg" alt="Rivela Bakery" />
       </a>
       <nav class="desktop-nav" aria-label="Navegación principal">
-        <a href="#catalogo">Catálogo</a>
-        <a href="#crea-cheesecake">Crea tu cheesecake</a>
-        <a href="#proceso">Proceso</a>
+        <a href="#catalogo">Menú</a>
+        <a href="#proceso">Cómo pedir</a>
       </nav>
       <button class="menu-toggle" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobileMenu" data-menu-toggle>
         <span></span>
@@ -27,15 +30,14 @@
         <span></span>
       </button>
       <button class="header-cart" type="button" data-open-cart aria-label="Abrir carrito">
-        <span>🛒</span>
+        <svg class="cart-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 5h2l1.7 9.1a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L20 8H7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10" cy="19" r="1.25" fill="currentColor"/><circle cx="17" cy="19" r="1.25" fill="currentColor"/></svg>
         <span class="cart-text">Carrito</span>
-        <span class="cart-count" data-cart-count>0</span>
+        <span class="cart-count" data-cart-count aria-live="polite">0</span>
       </button>
     </div>
     <nav class="mobile-menu" id="mobileMenu" aria-label="Menú móvil">
-      <a href="#catalogo">Catálogo</a>
-      <a href="#crea-cheesecake">Crea tu cheesecake</a>
-      <a href="#proceso">Proceso</a>
+      <a href="#catalogo">Menú</a>
+      <a href="#proceso">Cómo pedir</a>
     </nav>
   </header>
 
@@ -43,44 +45,48 @@
     <section class="hero" aria-labelledby="hero-title">
       <article class="hero-card">
         <div class="hero-content">
-          <span class="eyebrow">Horneado artesanal · Detalle premium</span>
-          <h1 id="hero-title">Dulces con memoria, diseño y <span>calma</span>.</h1>
-          <p>Pastelería artesanal para regalos, celebraciones y antojos especiales. Elige tus favoritos y cuéntanos por WhatsApp cómo quieres recibirlos.</p>
+          <span class="eyebrow">Rivela Bakery · Bucaramanga</span>
+          <h1 id="hero-title">Del horno de mamá, <span>al empaque perfecto.</span></h1>
+          <p>Un antojo bien hecho empieza por elegir fácil. Mira el menú, agrega tus favoritos al carrito y genera tu orden desde la página.</p>
           <div class="hero-actions">
-            <a class="btn btn-primary" href="#catalogo">Ver catálogo</a>
-            <button class="btn btn-secondary" type="button" data-open-cart>Revisar carrito</button>
+            <a class="btn btn-primary" href="#catalogo">Ver menú</a>
+            <button class="btn btn-secondary" type="button" data-open-cart>Ver mi pedido</button>
+          </div>
+          <div class="hero-signature" aria-label="Personalidad de Rivela">
+            <span>Cálida</span><span>Creativa</span><span>Detallista</span>
           </div>
         </div>
-        <div class="hero-badge"><span><b>15%</b>off cajas</span></div>
-        <svg class="hero-visual" viewBox="0 0 520 470" aria-hidden="true">
-          <path d="M84 334c50 42 255 63 341-11 47-40 33-111-7-135-55-34-78 19-146-41-65-57-160-36-192 30-24 49-44 116 4 157z" fill="#f1a7ef" opacity=".9"/>
-          <path d="M121 320c62 41 206 43 275-4" fill="none" stroke="#fffaf0" stroke-width="8" stroke-linecap="round" opacity=".78"/>
-          <path d="M148 260c55 20 184 34 255-9l-26 73c-53 31-170 39-242 2l13-66z" fill="#fffaf0"/>
-          <path d="M154 258c53 24 181 36 246-9" fill="none" stroke="#431819" stroke-width="4" stroke-linecap="round" opacity=".55"/>
-          <path d="M202 210c27-45 84-63 132-34 36 22 48 52 38 75-54 31-161 33-224 7 7-16 24-31 54-48z" fill="#5b2426"/>
-          <path d="M214 217c14 15 24 21 40 9 19-15 34-9 46 4 20 22 42 11 55-2" fill="none" stroke="#f1a7ef" stroke-width="8" stroke-linecap="round"/>
-          <circle cx="238" cy="196" r="7" fill="#fffaf0" opacity=".9"/>
-          <circle cx="318" cy="200" r="9" fill="#fffaf0" opacity=".78"/>
-          <path d="M92 132c22-21 63-16 79 11 18 31-10 65-45 58-29-6-50-45-34-69z" fill="#fffaf0" opacity=".9"/>
-          <path d="M103 149c20-7 40 5 45 26" fill="none" stroke="#431819" stroke-width="4" stroke-linecap="round" opacity=".45"/>
-          <path d="M390 118c29 3 50 31 42 57-8 28-42 36-65 17-22-18-15-68 23-74z" fill="#f8f1e7" opacity=".9"/>
-          <path d="M376 162c18-13 38-11 51 5" fill="none" stroke="#431819" stroke-width="4" stroke-linecap="round" opacity=".45"/>
-          <path d="M60 374c100 68 337 66 416-9" fill="none" stroke="#fffaf0" stroke-width="3" stroke-linecap="round" opacity=".45"/>
+        <div class="hero-badge" aria-hidden="true"><span><b>R</b>ivela</span></div>
+        <svg class="hero-visual" viewBox="0 0 560 500" aria-hidden="true">
+          <g class="doodle doodle-cookie">
+            <path d="M85 282c13-56 81-91 137-63 55 28 61 104 16 143-46 40-130 17-153-40-5-13-5-27 0-40Z" fill="#F2EDE6" stroke="#53231A" stroke-width="5"/>
+            <path d="M119 252c20 9 31-1 40-15 12 17 29 21 48 10 1 22 13 34 35 37-9 16-9 31 2 46-22 1-35 12-42 31-16-13-31-15-49-6-8-18-22-27-42-27 8-17 6-31-5-46 7-11 11-21 13-30Z" fill="#ECB1E5" opacity=".72"/>
+            <circle cx="135" cy="292" r="8" fill="#53231A"/><circle cx="188" cy="276" r="7" fill="#53231A"/><circle cx="177" cy="326" r="9" fill="#53231A"/><circle cx="219" cy="309" r="6" fill="#53231A"/>
+          </g>
+          <g class="doodle doodle-cup">
+            <path d="M332 155h120l-11 178c-2 25-19 42-43 42h-12c-24 0-41-17-43-42l-11-178Z" fill="#ECB1E5" stroke="#53231A" stroke-width="5" stroke-linejoin="round"/>
+            <path d="M321 154c0-13 10-23 23-23h97c13 0 23 10 23 23H321Z" fill="#F2EDE6" stroke="#53231A" stroke-width="5"/>
+            <path d="M369 242c13-20 44-20 57 0 15 23-14 48-29 61-15-13-43-38-28-61Z" fill="#F2EDE6" stroke="#53231A" stroke-width="4"/>
+          </g>
+          <g class="doodle doodle-heart">
+            <path d="M295 90c18-30 65-20 65 17 0 30-32 48-65 74-33-26-65-44-65-74 0-37 47-47 65-17Z" fill="#F2EDE6" stroke="#53231A" stroke-width="5"/>
+          </g>
+          <path d="M58 414c100 31 318 39 445-13" fill="none" stroke="#53231A" stroke-width="5" stroke-linecap="round" stroke-dasharray="3 14"/>
         </svg>
       </article>
 
-      <aside class="quick-panel" aria-label="Beneficios de compra">
+      <aside class="quick-panel" aria-label="Por qué pedir en Rivela">
         <div class="mini-row">
-          <div class="mini-icon">✦</div>
-          <div><h3>Hecho por encargo</h3><p>Preparamos cada pedido con tiempos cuidados y acabado artesanal.</p></div>
+          <div class="mini-icon" aria-hidden="true">01</div>
+          <div><h3>Elige sin vueltas</h3><p>Todo el menú, cantidades y precios reunidos en un solo lugar.</p></div>
         </div>
         <div class="mini-row">
-          <div class="mini-icon">↗</div>
-          <div><h3>Pedido por WhatsApp</h3><p>Recibimos tus datos para confirmar disponibilidad, entrega y pago.</p></div>
+          <div class="mini-icon" aria-hidden="true">02</div>
+          <div><h3>Arma tu pedido</h3><p>Agrega tus favoritos al carrito y revisa el resumen antes de continuar.</p></div>
         </div>
         <div class="mini-row">
-          <div class="mini-icon">♡</div>
-          <div><h3>Detalles para regalar</h3><p>Empaques delicados, dedicatorias y sabores pensados para compartir.</p></div>
+          <div class="mini-icon" aria-hidden="true">03</div>
+          <div><h3>Genera la orden</h3><p>Al final abrimos WhatsApp con toda la información lista para gestionar tu pedido.</p></div>
         </div>
       </aside>
     </section>
@@ -88,10 +94,10 @@
     <section class="section" id="catalogo" aria-labelledby="catalog-title">
       <div class="section-heading">
         <div>
-          <span class="section-kicker">Catálogo</span>
-          <h2 id="catalog-title">Elige tu próximo antojo.</h2>
+          <span class="section-kicker">Menú Rivela</span>
+          <h2 id="catalog-title">¿Con cuál empiezas?</h2>
         </div>
-        <p>Postres, cajas y dulces artesanales preparados bajo pedido. Revisa sabores, porciones y precios antes de enviar tu solicitud.</p>
+        <p>Explora el menú, abre cada producto para ver sus detalles y agrega al carrito lo que quieras pedir.</p>
       </div>
 
       <div class="filters" aria-label="Filtros de catálogo">
@@ -104,33 +110,19 @@
       <div class="product-grid" id="productGrid"></div>
     </section>
 
-    <section class="section" id="crea-cheesecake" aria-labelledby="custom-cheesecake-title">
-      <div class="custom-cheesecake-card">
-        <div class="custom-cheesecake-copy">
-          <span class="section-kicker">Crea tu cheesecake</span>
-          <h2 id="custom-cheesecake-title">Arma una combinación a tu gusto.</h2>
-          <p>Elige base, sabor y topping. Lo agregaremos como pedido personalizado para confirmarlo contigo por WhatsApp.</p>
-          <button class="btn btn-primary" type="button" data-open-cheesecake>Personalizar cheesecake</button>
-        </div>
-        <button class="custom-cheesecake-preview" type="button" data-open-cheesecake aria-label="Personalizar cheesecake">
-          <div class="custom-cheesecake-plate" aria-hidden="true">
-            <span></span>
-          </div>
-        </button>
-      </div>
-    </section>
-
     <section class="section" id="proceso">
       <div class="story-band">
         <div>
-          <span class="section-kicker" style="color:var(--lavender-2)">Cómo funciona</span>
-          <h2>Una forma sencilla de pedir algo especial.</h2>
-          <p>Selecciona tus productos, agrega los datos de entrega y envíanos tu pedido. Te confirmaremos disponibilidad, tiempos y medios de pago por WhatsApp.</p>
+          <span class="section-kicker">Cómo pedir</span>
+          <h2>Tu pedido, sin mensajes de ida y vuelta.</h2>
+          <p>La página organiza la orden antes de abrir WhatsApp. Así llegas con productos, cantidades y datos de entrega listos para gestionar.</p>
+          <div class="story-note">El pedido se confirma cuando Rivela valida disponibilidad, entrega y pago.</div>
         </div>
         <div class="story-features">
-          <div class="story-feature"><b>1</b><span><b>Explora.</b><br>Conoce nuestras preparaciones, precios y detalles de cada producto.</span></div>
-          <div class="story-feature"><b>2</b><span><b>Elige.</b><br>Agrega al carrito las unidades que quieres para tu pedido o regalo.</span></div>
-          <div class="story-feature"><b>3</b><span><b>Confirma.</b><br>Envíanos la solicitud por WhatsApp y coordinamos contigo la entrega.</span></div>
+          <div class="story-feature"><b>1</b><span><b>Elige.</b><br>Revisa el menú y abre cada producto para conocer sus detalles.</span></div>
+          <div class="story-feature"><b>2</b><span><b>Agrega.</b><br>Define cantidades y revisa todo desde el carrito.</span></div>
+          <div class="story-feature"><b>3</b><span><b>Completa.</b><br>Indica entrega, fecha y datos necesarios para preparar la orden.</span></div>
+          <div class="story-feature"><b>4</b><span><b>Envía.</b><br>Generamos el mensaje con tu resumen y lo abrimos en WhatsApp.</span></div>
         </div>
       </div>
     </section>
@@ -158,7 +150,7 @@
         <p id="modalDescription"></p>
         <ul class="detail-list" id="modalDetails"></ul>
         <div class="qty-box product-quantity-box">
-          <span>Cantidad del cheesecake</span>
+          <span>Cantidad</span>
           <div class="qty-control">
             <button type="button" data-detail-minus aria-label="Restar cantidad">−</button>
             <span class="qty-value" id="detailQty">1</span>
@@ -269,17 +261,17 @@
               <input id="deliveryDate" name="Fecha deseada" type="date" required />
               <span class="date-placeholder" aria-hidden="true">Ej. dd/mm/aaaa</span>
             </div>
-            <div class="field field-full">
-              <label for="address">Dirección / punto de recogida</label>
+            <div class="field field-full" data-delivery-address>
+              <label for="address">Dirección de entrega</label>
               <input id="address" name="Dirección" autocomplete="street-address" required placeholder="Calle, número, piso, referencia" />
             </div>
-            <div class="field">
+            <div class="field" data-delivery-address>
               <label for="city">Ciudad</label>
-              <input id="city" name="Ciudad" autocomplete="address-level2" required placeholder="Ej. Floridablanca" />
+              <input id="city" name="Ciudad" autocomplete="address-level2" required placeholder="Ej. Bucaramanga" />
             </div>
-            <div class="field">
+            <div class="field" data-delivery-address>
               <label for="zone">Barrio / zona</label>
-              <input id="zone" name="Zona" placeholder="Ej. Ciudad Valencia" />
+              <input id="zone" name="Zona" placeholder="Ej. Cabecera" />
             </div>
             <div class="field">
               <label for="payment">Pago preferido</label>
@@ -304,11 +296,17 @@
     </div>
   </section>
 
-  <div class="toast" id="toast">Producto agregado</div>
+  <div class="toast" id="toast" role="status" aria-live="polite">Producto agregado</div>
 
   <footer class="site-footer">
-    <span>Rivela Bakery · Pastelería premium</span>
-    <span>Pedidos por encargo, cajas regalo y dulces artesanales.</span>
+    <div class="footer-brand">
+      <img src="assets/rivelalogo.svg" alt="Rivela Bakery" />
+      <p>Del horno de mamá, al empaque perfecto.</p>
+    </div>
+    <div class="footer-copy">
+      <span>Bucaramanga, Colombia</span>
+      <a href="#catalogo">Ver menú ↑</a>
+    </div>
   </footer>
 
   <script src="js/main.js"></script>
