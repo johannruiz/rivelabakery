@@ -511,7 +511,6 @@
     }
 
     function openCheesecakeModal(productId = null){
-      rememberFocus();
       const editingProduct = productId ? getProduct(productId) : null;
       state.editingCustomId = editingProduct?.isCustom ? productId : null;
       state.cheesecakeQty = state.editingCustomId ? (state.cart[productId] || 1) : 1;
@@ -854,12 +853,33 @@
     document.addEventListener('keydown', event => {
       if(event.key === 'Escape'){
         closeAll();
+        return;
+      }
+
+      if(event.key !== 'Tab') return;
+      const activeDialog = [modal, cheesecakeModal, cartDrawer, checkoutPanel]
+        .find(item => item.classList.contains('is-open'));
+      if(!activeDialog) return;
+
+      const focusables = [...activeDialog.querySelectorAll(
+        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      )].filter(item => !item.hidden && item.offsetParent !== null);
+
+      if(!focusables.length) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+
+      if(event.shiftKey && document.activeElement === first){
+        event.preventDefault();
+        last.focus();
+      }else if(!event.shiftKey && document.activeElement === last){
+        event.preventDefault();
+        first.focus();
       }
     });
 
     async function init(){
       await loadProducts();
-      renderPromoBanner();
       renderCheckoutOptions();
       renderCheesecakeOptions();
       setMinimumDeliveryDate();
